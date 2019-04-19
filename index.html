@@ -65,7 +65,7 @@
     <article id="post-java 10 新特性" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/my-blog/2019/04/19/java 10 新特性/" class="article-date">
-  <time datetime="2019-04-19T12:15:18.088Z" itemprop="datePublished">2019-04-19</time>
+  <time datetime="2019-04-19T12:23:17.296Z" itemprop="datePublished">2019-04-19</time>
 </a>
     
   </div>
@@ -76,7 +76,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/my-blog/2019/04/19/java 10 新特性/">利用Ireport做PDF</a>
+      <a class="article-title" href="/my-blog/2019/04/19/java 10 新特性/">JAVA 10</a>
     </h1>
   
 
@@ -84,17 +84,14 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h5 id="利用iReprot生成报表"><a href="#利用iReprot生成报表" class="headerlink" title="利用iReprot生成报表"></a>利用iReprot生成报表</h5><h5 id="首先，下载好iReport工具，打开程序，在这个可以开启一个新的文档。"><a href="#首先，下载好iReport工具，打开程序，在这个可以开启一个新的文档。" class="headerlink" title="首先，下载好iReport工具，打开程序，在这个可以开启一个新的文档。"></a>首先，下载好iReport工具，打开程序，在这个可以开启一个新的文档。</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ 春风十里</span><br></pre></td></tr></table></figure>
-<p>ava 9才发布几个月，很多玩意都没整明白，现在Java 10又要来了。</p>
+        <p>java 9才发布几个月，很多玩意都没整明白，现在Java 10又要来了。</p>
 <p>这时候我真想说：线上用的JDK 7，甚至JDK 6，而JDK 8 还没用熟，JDK 9 才发布不久不知道啥玩意，JDK 10……</p>
 <p>刚学Java的同学是不是感觉一脸蒙逼？</p>
 <p>就连我这个老司机也同样感觉如此！</p>
 <p>Java 更新越来越快，我们做技术的也要跟上步伐，不然总会慢别人一拍，这新东西从国外到国内应用一般要好几年的时间，如果我们提前了解并应用这些新技术对自己不是坏事。</p>
 <p>Java 10的新特性</p>
 <p>说了这么多，看Java 10都会有哪些特性来改变我们写代码的方式呢？！</p>
-<ol>
-<li>局部变量类型推断</li>
-</ol>
+<p>###1. 局部变量类型推断</p>
 <p>局部变量类型推断可以说是Java 10中最值得注意的特性，这是Java语言开发人员为了简化Java应用程序的编写而采取的又一步，如下图所示。</p>
 <p>这个新功能将为Java增加一些语法糖 - 简化它并改善开发者体验。新的语法将减少与编写Java相关的冗长度，同时保持对静态类型安全性的承诺。</p>
 <p>局部变量类型推断将引入”var”关键字，也就是你可以随意定义变量而不必指定变量的类型，如：</p>
@@ -104,43 +101,25 @@
 <p>局部变量类型推荐仅限于如下使用场景：</p>
 <p>局部变量初始化for循环内部索引变量传统的for循环声明变量Java官方表示，它不能用于以下几个地方：</p>
 <p>方法参数构造函数参数方法返回类型字段捕获表达式（或任何其他类型的变量声明）</p>
-<ol start="2">
-<li>GC改进和内存管理</li>
-</ol>
+<p>###2. GC改进和内存管理</p>
 <p>JDK 10中有2个JEP专门用于改进当前的垃圾收集元素。</p>
 <p>第一个垃圾收集器接口是（JEP 304），它将引入一个纯净的垃圾收集器接口，以帮助改进不同垃圾收集器的源代码隔离。</p>
 <p>预定用于Java 10的第二个JEP是针对G1的并行完全GC（JEP 307），其重点在于通过完全GC并行来改善G1最坏情况的等待时间。G1是Java 9中的默认GC，并且此JEP的目标是使G1平行。</p>
-<ol start="3">
-<li>线程本地握手（JEP 312）</li>
-</ol>
+<p>###3. 线程本地握手（JEP 312）</p>
 <p>JDK 10将引入一种在线程上执行回调的新方法，因此这将会很方便能停止单个线程而不是停止全部线程或者一个都不停。</p>
-<ol start="4">
-<li>备用内存设备上的堆分配（JEP 316）</li>
-</ol>
+<p>###4. 备用内存设备上的堆分配（JEP 316）</p>
 <p>允许HotSpot VM在备用内存设备上分配Java对象堆内存，该内存设备将由用户指定。</p>
-<ol start="5">
-<li>其他Unicode语言 - 标记扩展（JEP 314）</li>
-</ol>
+<p>###5. 其他Unicode语言 - 标记扩展（JEP 314）</p>
 <p>目标是增强java.util.Locale及其相关的API，以便实现语言标记语法的其他Unicode扩展（BCP 47）。</p>
-<ol start="6">
-<li>基于Java的实验性JIT编译器</li>
-</ol>
+<p>###6. 基于Java的实验性JIT编译器</p>
 <p>Oracle希望将其Java JIT编译器Graal用作Linux / x64平台上的实验性JIT编译器。</p>
-<ol start="7">
-<li>根证书（JEP 319）</li>
-</ol>
+<p>###7. 根证书（JEP 319）</p>
 <p>这个的目标是在Oracle的Java SE中开源根证书。</p>
-<ol start="8">
-<li>根证书颁发认证</li>
-</ol>
+<p>###8. 根证书颁发认证</p>
 <p>这将使OpenJDK对开发人员更具吸引力，它还旨在减少OpenJDK和Oracle JDK构建之间的差异。</p>
-<ol start="9">
-<li>将JDK生态整合单个存储库（JEP 296）</li>
-</ol>
+<p>###9. 将JDK生态整合单个存储库（JEP 296）</p>
 <p>此JEP的主要目标是执行一些内存管理，并将JDK生态的众多存储库组合到一个存储库中。</p>
-<ol start="10">
-<li>删除工具javah（JEP 313）</li>
-</ol>
+<p>###10. 删除工具javah（JEP 313）</p>
 <p>从JDK中移除了javah工具，这个很简单并且很重要。</p>
 <p>Java 10尝鲜</p>
 <p>就像所有其他JDK版本一样，Oracle已经发布了一个Java 10初始候选版本，Java开发者可以下载此版本用来测试新功能。如果你对Java 10抱有期待想提早尝试，那么现在就开始吧！</p>
@@ -152,7 +131,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjuo1id7k0000ewv8fqruaye7" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjuo1p5l2000024v8pmxbwohj" class="article-share-link">Share</a>
       
       
     </footer>
@@ -197,7 +176,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/hello-world/" data-id="cjuo1h2ul0000v8v87in70pjo" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/hello-world/" data-id="cjuo1p5l7000124v8oa8a9loz" class="article-share-link">Share</a>
       
       
     </footer>
@@ -233,7 +212,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/测试/" data-id="cjuo1h2uv0002v8v8vdf0n3vk" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/测试/" data-id="cjuo1p5lf000224v81fuefooz" class="article-share-link">Share</a>
       
       
     </footer>
@@ -274,7 +253,7 @@
       <ul>
         
           <li>
-            <a href="/my-blog/2019/04/19/java 10 新特性/">利用Ireport做PDF</a>
+            <a href="/my-blog/2019/04/19/java 10 新特性/">JAVA 10</a>
           </li>
         
           <li>
