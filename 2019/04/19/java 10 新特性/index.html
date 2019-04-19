@@ -14,7 +14,7 @@
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="java 9才发布几个月，很多玩意都没整明白，现在Java 10又要来了。 这时候我真想说：线上用的JDK 7，甚至JDK 6，而JDK 8 还没用熟，JDK 9 才发布不久不知道啥玩意，JDK 10…… 刚学Java的同学是不是感觉一脸蒙逼？ 就连我这个老司机也同样感觉如此！ Java 更新越来越快，我们做技术的也要跟上步伐，不然总会慢别人一拍，这新东西从国外到国内应用一般要好几年的时间，如果我">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-04-19T12:23:17.297Z">
+<meta property="og:updated_time" content="2019-04-19T12:27:17.449Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JAVA 10">
 <meta name="twitter:description" content="java 9才发布几个月，很多玩意都没整明白，现在Java 10又要来了。 这时候我真想说：线上用的JDK 7，甚至JDK 6，而JDK 8 还没用熟，JDK 9 才发布不久不知道啥玩意，JDK 10…… 刚学Java的同学是不是感觉一脸蒙逼？ 就连我这个老司机也同样感觉如此！ Java 更新越来越快，我们做技术的也要跟上步伐，不然总会慢别人一拍，这新东西从国外到国内应用一般要好几年的时间，如果我">
@@ -67,7 +67,7 @@
         <section id="main"><article id="post-java 10 新特性" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/my-blog/2019/04/19/java 10 新特性/" class="article-date">
-  <time datetime="2019-04-19T12:23:17.296Z" itemprop="datePublished">2019-04-19</time>
+  <time datetime="2019-04-19T12:27:17.449Z" itemprop="datePublished">2019-04-19</time>
 </a>
     
   </div>
@@ -93,8 +93,7 @@
 <p>Java 更新越来越快，我们做技术的也要跟上步伐，不然总会慢别人一拍，这新东西从国外到国内应用一般要好几年的时间，如果我们提前了解并应用这些新技术对自己不是坏事。</p>
 <p>Java 10的新特性</p>
 <p>说了这么多，看Java 10都会有哪些特性来改变我们写代码的方式呢？！</p>
-<p>###1. 局部变量类型推断</p>
-<p>局部变量类型推断可以说是Java 10中最值得注意的特性，这是Java语言开发人员为了简化Java应用程序的编写而采取的又一步，如下图所示。</p>
+<h3 id="1-局部变量类型推断"><a href="#1-局部变量类型推断" class="headerlink" title="1. 局部变量类型推断"></a>1. 局部变量类型推断</h3><p>局部变量类型推断可以说是Java 10中最值得注意的特性，这是Java语言开发人员为了简化Java应用程序的编写而采取的又一步，如下图所示。</p>
 <p>这个新功能将为Java增加一些语法糖 - 简化它并改善开发者体验。新的语法将减少与编写Java相关的冗长度，同时保持对静态类型安全性的承诺。</p>
 <p>局部变量类型推断将引入”var”关键字，也就是你可以随意定义变量而不必指定变量的类型，如：</p>
 <p>将被下面这个新语法所取代：</p>
@@ -103,37 +102,25 @@
 <p>局部变量类型推荐仅限于如下使用场景：</p>
 <p>局部变量初始化for循环内部索引变量传统的for循环声明变量Java官方表示，它不能用于以下几个地方：</p>
 <p>方法参数构造函数参数方法返回类型字段捕获表达式（或任何其他类型的变量声明）</p>
-<p>###2. GC改进和内存管理</p>
-<p>JDK 10中有2个JEP专门用于改进当前的垃圾收集元素。</p>
+<h3 id="2-GC改进和内存管理"><a href="#2-GC改进和内存管理" class="headerlink" title="2. GC改进和内存管理"></a>2. GC改进和内存管理</h3><p>JDK 10中有2个JEP专门用于改进当前的垃圾收集元素。</p>
 <p>第一个垃圾收集器接口是（JEP 304），它将引入一个纯净的垃圾收集器接口，以帮助改进不同垃圾收集器的源代码隔离。</p>
 <p>预定用于Java 10的第二个JEP是针对G1的并行完全GC（JEP 307），其重点在于通过完全GC并行来改善G1最坏情况的等待时间。G1是Java 9中的默认GC，并且此JEP的目标是使G1平行。</p>
-<p>###3. 线程本地握手（JEP 312）</p>
-<p>JDK 10将引入一种在线程上执行回调的新方法，因此这将会很方便能停止单个线程而不是停止全部线程或者一个都不停。</p>
-<p>###4. 备用内存设备上的堆分配（JEP 316）</p>
-<p>允许HotSpot VM在备用内存设备上分配Java对象堆内存，该内存设备将由用户指定。</p>
-<p>###5. 其他Unicode语言 - 标记扩展（JEP 314）</p>
-<p>目标是增强java.util.Locale及其相关的API，以便实现语言标记语法的其他Unicode扩展（BCP 47）。</p>
-<p>###6. 基于Java的实验性JIT编译器</p>
-<p>Oracle希望将其Java JIT编译器Graal用作Linux / x64平台上的实验性JIT编译器。</p>
-<p>###7. 根证书（JEP 319）</p>
-<p>这个的目标是在Oracle的Java SE中开源根证书。</p>
-<p>###8. 根证书颁发认证</p>
-<p>这将使OpenJDK对开发人员更具吸引力，它还旨在减少OpenJDK和Oracle JDK构建之间的差异。</p>
-<p>###9. 将JDK生态整合单个存储库（JEP 296）</p>
-<p>此JEP的主要目标是执行一些内存管理，并将JDK生态的众多存储库组合到一个存储库中。</p>
-<p>###10. 删除工具javah（JEP 313）</p>
-<p>从JDK中移除了javah工具，这个很简单并且很重要。</p>
+<h3 id="3-线程本地握手（JEP-312）"><a href="#3-线程本地握手（JEP-312）" class="headerlink" title="3. 线程本地握手（JEP 312）"></a>3. 线程本地握手（JEP 312）</h3><p>JDK 10将引入一种在线程上执行回调的新方法，因此这将会很方便能停止单个线程而不是停止全部线程或者一个都不停。</p>
+<h3 id="4-备用内存设备上的堆分配（JEP-316）"><a href="#4-备用内存设备上的堆分配（JEP-316）" class="headerlink" title="4. 备用内存设备上的堆分配（JEP 316）"></a>4. 备用内存设备上的堆分配（JEP 316）</h3><p>允许HotSpot VM在备用内存设备上分配Java对象堆内存，该内存设备将由用户指定。</p>
+<h3 id="5-其他Unicode语言-标记扩展（JEP-314）"><a href="#5-其他Unicode语言-标记扩展（JEP-314）" class="headerlink" title="5. 其他Unicode语言 - 标记扩展（JEP 314）"></a>5. 其他Unicode语言 - 标记扩展（JEP 314）</h3><p>目标是增强java.util.Locale及其相关的API，以便实现语言标记语法的其他Unicode扩展（BCP 47）。</p>
+<h3 id="6-基于Java的实验性JIT编译器"><a href="#6-基于Java的实验性JIT编译器" class="headerlink" title="6. 基于Java的实验性JIT编译器"></a>6. 基于Java的实验性JIT编译器</h3><p>Oracle希望将其Java JIT编译器Graal用作Linux / x64平台上的实验性JIT编译器。</p>
+<h3 id="7-根证书（JEP-319）"><a href="#7-根证书（JEP-319）" class="headerlink" title="7. 根证书（JEP 319）"></a>7. 根证书（JEP 319）</h3><p>这个的目标是在Oracle的Java SE中开源根证书。</p>
+<h3 id="8-根证书颁发认证"><a href="#8-根证书颁发认证" class="headerlink" title="8. 根证书颁发认证"></a>8. 根证书颁发认证</h3><p>这将使OpenJDK对开发人员更具吸引力，它还旨在减少OpenJDK和Oracle JDK构建之间的差异。</p>
+<h3 id="9-将JDK生态整合单个存储库（JEP-296）"><a href="#9-将JDK生态整合单个存储库（JEP-296）" class="headerlink" title="9. 将JDK生态整合单个存储库（JEP 296）"></a>9. 将JDK生态整合单个存储库（JEP 296）</h3><p>此JEP的主要目标是执行一些内存管理，并将JDK生态的众多存储库组合到一个存储库中。</p>
+<h3 id="10-删除工具javah（JEP-313）"><a href="#10-删除工具javah（JEP-313）" class="headerlink" title="10. 删除工具javah（JEP 313）"></a>10. 删除工具javah（JEP 313）</h3><p>从JDK中移除了javah工具，这个很简单并且很重要。</p>
 <p>Java 10尝鲜</p>
 <p>就像所有其他JDK版本一样，Oracle已经发布了一个Java 10初始候选版本，Java开发者可以下载此版本用来测试新功能。如果你对Java 10抱有期待想提早尝试，那么现在就开始吧！</p>
 <p>尝鲜地址：<a href="http://openjdk.java.net/projects/jdk/10/" target="_blank" rel="noopener">http://openjdk.java.net/projects/jdk/10/</a></p>
-<p>最后的一点想法</p>
-<p>对于第一点新特性来说确实是一个大的跨越，其他特性或多或少都能带给开发者福音。但最终Java 10会是什么样，或许还会增加更多实用性的新功能或者优化，我们还得期待！</p>
-<p>现在要做的就是，赶紧熟悉JDK 8，现在已经是很多互联网企业标配了。如果还在使用JDK4-7，那真的是要OUT了。。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjuo1p5l2000024v8pmxbwohj" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjuo1vk7p0002igv8kvyalqp8" class="article-share-link">Share</a>
       
       
     </footer>
