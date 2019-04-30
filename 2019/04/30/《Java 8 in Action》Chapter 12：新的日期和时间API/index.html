@@ -5,15 +5,19 @@
   
 
   
-  <title>Hexo</title>
+  <title>《Java 8 in Action》Chapter 12：新的日期和时间API | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="https://github.com/zhaoqixing/my-blog.git/index.html">
+  <meta name="description" content="在Java 1.0中，对日期和时间的支持只能依赖java.util.Date类。同时这个类还有两个很大的缺点：年份的起始选择是1900年，月份的起始从0开始。 在Java 1.1中，Date类中的很多方法被废弃，取而代之的是java.util.Calendar类。然而Calendar类也有类似的问题和设计缺陷，导致使用这些方法写出的代码非常容易出错。 ###1. 使用LocalDate 和Loca">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Java 8 in Action》Chapter 12：新的日期和时间API">
+<meta property="og:url" content="https://github.com/zhaoqixing/my-blog.git/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="在Java 1.0中，对日期和时间的支持只能依赖java.util.Date类。同时这个类还有两个很大的缺点：年份的起始选择是1900年，月份的起始从0开始。 在Java 1.1中，Date类中的很多方法被废弃，取而代之的是java.util.Calendar类。然而Calendar类也有类似的问题和设计缺陷，导致使用这些方法写出的代码非常容易出错。 ###1. 使用LocalDate 和Loca">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-30T08:51:23.602Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="《Java 8 in Action》Chapter 12：新的日期和时间API">
+<meta name="twitter:description" content="在Java 1.0中，对日期和时间的支持只能依赖java.util.Date类。同时这个类还有两个很大的缺点：年份的起始选择是1900年，月份的起始从0开始。 在Java 1.1中，Date类中的很多方法被废弃，取而代之的是java.util.Calendar类。然而Calendar类也有类似的问题和设计缺陷，导致使用这些方法写出的代码非常容易出错。 ###1. 使用LocalDate 和Loca">
   
     <link rel="alternate" href="/my-blog/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -60,9 +64,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-《Java 8 in Action》Chapter 12：新的日期和时间API" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-《Java 8 in Action》Chapter 12：新的日期和时间API" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/my-blog/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/" class="article-date">
   <time datetime="2019-04-30T08:51:23.602Z" itemprop="datePublished">2019-04-30</time>
@@ -75,8 +77,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/my-blog/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/">《Java 8 in Action》Chapter 12：新的日期和时间API</a>
+    <h1 class="article-title" itemprop="name">
+      《Java 8 in Action》Chapter 12：新的日期和时间API
     </h1>
   
 
@@ -289,158 +291,19 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-java 10 新特性" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/my-blog/2019/04/19/java 10 新特性/" class="article-date">
-  <time datetime="2019-04-19T12:27:17.449Z" itemprop="datePublished">2019-04-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/my-blog/2019/04/19/java 10 新特性/">JAVA 10</a>
-    </h1>
+    <a href="/my-blog/2019/04/19/java 10 新特性/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">JAVA 10</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>java 9才发布几个月，很多玩意都没整明白，现在Java 10又要来了。</p>
-<p>这时候我真想说：线上用的JDK 7，甚至JDK 6，而JDK 8 还没用熟，JDK 9 才发布不久不知道啥玩意，JDK 10……</p>
-<p>刚学Java的同学是不是感觉一脸蒙逼？</p>
-<p>就连我这个老司机也同样感觉如此！</p>
-<p>Java 更新越来越快，我们做技术的也要跟上步伐，不然总会慢别人一拍，这新东西从国外到国内应用一般要好几年的时间，如果我们提前了解并应用这些新技术对自己不是坏事。</p>
-<p>Java 10的新特性</p>
-<p>说了这么多，看Java 10都会有哪些特性来改变我们写代码的方式呢？！</p>
-<h3 id="1-局部变量类型推断"><a href="#1-局部变量类型推断" class="headerlink" title="1. 局部变量类型推断"></a>1. 局部变量类型推断</h3><p>局部变量类型推断可以说是Java 10中最值得注意的特性，这是Java语言开发人员为了简化Java应用程序的编写而采取的又一步，如下图所示。</p>
-<p>这个新功能将为Java增加一些语法糖 - 简化它并改善开发者体验。新的语法将减少与编写Java相关的冗长度，同时保持对静态类型安全性的承诺。</p>
-<p>局部变量类型推断将引入”var”关键字，也就是你可以随意定义变量而不必指定变量的类型，如：</p>
-<p>将被下面这个新语法所取代：</p>
-<p>看完是不是有点JS的即视感？？？越来越像JS了吗？！虽然类型推断在Java中不是一个新概念，但在局部变量中确是很大的一个改进。</p>
-<p>说到类型推断，从JDK 5引进泛型，到JDK 7的”&lt;&gt;”操作符允许不绑定类型而初始化List，再到JDK 8的Lambda表达式，再到现在JDK 10的局部变量类型推断，Java类型推断正大刀阔斧的向前发展。</p>
-<p>局部变量类型推荐仅限于如下使用场景：</p>
-<p>局部变量初始化for循环内部索引变量传统的for循环声明变量Java官方表示，它不能用于以下几个地方：</p>
-<p>方法参数构造函数参数方法返回类型字段捕获表达式（或任何其他类型的变量声明）</p>
-<h3 id="2-GC改进和内存管理"><a href="#2-GC改进和内存管理" class="headerlink" title="2. GC改进和内存管理"></a>2. GC改进和内存管理</h3><p>JDK 10中有2个JEP专门用于改进当前的垃圾收集元素。</p>
-<p>第一个垃圾收集器接口是（JEP 304），它将引入一个纯净的垃圾收集器接口，以帮助改进不同垃圾收集器的源代码隔离。</p>
-<p>预定用于Java 10的第二个JEP是针对G1的并行完全GC（JEP 307），其重点在于通过完全GC并行来改善G1最坏情况的等待时间。G1是Java 9中的默认GC，并且此JEP的目标是使G1平行。</p>
-<h3 id="3-线程本地握手（JEP-312）"><a href="#3-线程本地握手（JEP-312）" class="headerlink" title="3. 线程本地握手（JEP 312）"></a>3. 线程本地握手（JEP 312）</h3><p>JDK 10将引入一种在线程上执行回调的新方法，因此这将会很方便能停止单个线程而不是停止全部线程或者一个都不停。</p>
-<h3 id="4-备用内存设备上的堆分配（JEP-316）"><a href="#4-备用内存设备上的堆分配（JEP-316）" class="headerlink" title="4. 备用内存设备上的堆分配（JEP 316）"></a>4. 备用内存设备上的堆分配（JEP 316）</h3><p>允许HotSpot VM在备用内存设备上分配Java对象堆内存，该内存设备将由用户指定。</p>
-<h3 id="5-其他Unicode语言-标记扩展（JEP-314）"><a href="#5-其他Unicode语言-标记扩展（JEP-314）" class="headerlink" title="5. 其他Unicode语言 - 标记扩展（JEP 314）"></a>5. 其他Unicode语言 - 标记扩展（JEP 314）</h3><p>目标是增强java.util.Locale及其相关的API，以便实现语言标记语法的其他Unicode扩展（BCP 47）。</p>
-<h3 id="6-基于Java的实验性JIT编译器"><a href="#6-基于Java的实验性JIT编译器" class="headerlink" title="6. 基于Java的实验性JIT编译器"></a>6. 基于Java的实验性JIT编译器</h3><p>Oracle希望将其Java JIT编译器Graal用作Linux / x64平台上的实验性JIT编译器。</p>
-<h3 id="7-根证书（JEP-319）"><a href="#7-根证书（JEP-319）" class="headerlink" title="7. 根证书（JEP 319）"></a>7. 根证书（JEP 319）</h3><p>这个的目标是在Oracle的Java SE中开源根证书。</p>
-<h3 id="8-根证书颁发认证"><a href="#8-根证书颁发认证" class="headerlink" title="8. 根证书颁发认证"></a>8. 根证书颁发认证</h3><p>这将使OpenJDK对开发人员更具吸引力，它还旨在减少OpenJDK和Oracle JDK构建之间的差异。</p>
-<h3 id="9-将JDK生态整合单个存储库（JEP-296）"><a href="#9-将JDK生态整合单个存储库（JEP-296）" class="headerlink" title="9. 将JDK生态整合单个存储库（JEP 296）"></a>9. 将JDK生态整合单个存储库（JEP 296）</h3><p>此JEP的主要目标是执行一些内存管理，并将JDK生态的众多存储库组合到一个存储库中。</p>
-<h3 id="10-删除工具javah（JEP-313）"><a href="#10-删除工具javah（JEP-313）" class="headerlink" title="10. 删除工具javah（JEP 313）"></a>10. 删除工具javah（JEP 313）</h3><p>从JDK中移除了javah工具，这个很简单并且很重要。</p>
-<p>Java 10尝鲜</p>
-<p>就像所有其他JDK版本一样，Oracle已经发布了一个Java 10初始候选版本，Java开发者可以下载此版本用来测试新功能。如果你对Java 10抱有期待想提早尝试，那么现在就开始吧！</p>
-<p>尝鲜地址：<a href="http://openjdk.java.net/projects/jdk/10/" target="_blank" rel="noopener">http://openjdk.java.net/projects/jdk/10/</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjv3qt6w20001gwv8ns1d0cxm" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
   
 </article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/my-blog/2019/04/19/hello-world/" class="article-date">
-  <time datetime="2019-04-19T10:46:31.439Z" itemprop="datePublished">2019-04-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/my-blog/2019/04/19/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/hello-world/" data-id="cjv3qt6vw0000gwv88tkde4vq" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-测试" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/my-blog/2019/04/19/测试/" class="article-date">
-  <time datetime="2019-04-19T09:49:44.000Z" itemprop="datePublished">2019-04-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/my-blog/2019/04/19/测试/">测试</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/测试/" data-id="cjv3qt6w50003gwv8dahb724a" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-
 
 </section>
         
