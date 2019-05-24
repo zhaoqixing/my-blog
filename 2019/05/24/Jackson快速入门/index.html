@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>jackson 快速入门 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Java生态圈中有很多处理JSON和XML格式化的类库，Jackson是其中比较著名的一个。虽然JDK自带了XML处理类库，但是相对来说比较低级，使用本文介绍的Jackson等高级类库处理起来会方便很多。 ###引入类库 ext {     jacksonVersion = &amp;apos;2.9.5&amp;apos; }  dependencies {     compile group: &amp;apos;c">
+<meta property="og:type" content="article">
+<meta property="og:title" content="jackson 快速入门">
+<meta property="og:url" content="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Java生态圈中有很多处理JSON和XML格式化的类库，Jackson是其中比较著名的一个。虽然JDK自带了XML处理类库，但是相对来说比较低级，使用本文介绍的Jackson等高级类库处理起来会方便很多。 ###引入类库 ext {     jacksonVersion = &amp;apos;2.9.5&amp;apos; }  dependencies {     compile group: &amp;apos;c">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-05-24T11:05:30.820Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="jackson 快速入门">
+<meta name="twitter:description" content="Java生态圈中有很多处理JSON和XML格式化的类库，Jackson是其中比较著名的一个。虽然JDK自带了XML处理类库，但是相对来说比较低级，使用本文介绍的Jackson等高级类库处理起来会方便很多。 ###引入类库 ext {     jacksonVersion = &amp;apos;2.9.5&amp;apos; }  dependencies {     compile group: &amp;apos;c">
+  
+    <link rel="alternate" href="/my-blog/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/my-blog/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/my-blog/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/my-blog/">Home</a>
+        
+          <a class="main-nav-link" href="/my-blog/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/my-blog/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/zhaoqixing/my-blog.git"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Jackson快速入门" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/my-blog/2019/05/24/Jackson快速入门/" class="article-date">
+  <time datetime="2019-05-24T11:05:30.819Z" itemprop="datePublished">2019-05-24</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      jackson 快速入门
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Java生态圈中有很多处理JSON和XML格式化的类库，Jackson是其中比较著名的一个。虽然JDK自带了XML处理类库，但是相对来说比较低级，使用本文介绍的Jackson等高级类库处理起来会方便很多。</p>
+<p>###引入类库</p>
+<pre><code>ext {
+    jacksonVersion = &apos;2.9.5&apos;
+}
+
+dependencies {
+    compile group: &apos;com.fasterxml.jackson.core&apos;, name: &apos;jackson-core&apos;, version: jacksonVersion
+    compile group: &apos;com.fasterxml.jackson.core&apos;, name: &apos;jackson-databind&apos;, version: jacksonVersion
+    compile group: &apos;com.fasterxml.jackson.core&apos;, name: &apos;jackson-annotations&apos;, version: jacksonVersion
+    // 引入XML功能
+    compile group: &apos;com.fasterxml.jackson.dataformat&apos;, name: &apos;jackson-dataformat-xml&apos;, version: jacksonVersion
+    // 比JDK自带XML实现更高效的类库
+    compile group: &apos;com.fasterxml.woodstox&apos;, name: &apos;woodstox-core&apos;, version: &apos;5.1.0&apos;
+    // Java 8 新功能
+    compile group: &apos;com.fasterxml.jackson.datatype&apos;, name: &apos;jackson-datatype-jsr310&apos;, version: jacksonVersion
+    compile group: &apos;com.fasterxml.jackson.module&apos;, name: &apos;jackson-module-parameter-names&apos;, version: jacksonVersion
+    compile group: &apos;com.fasterxml.jackson.datatype&apos;, name: &apos;jackson-datatype-jdk8&apos;, version: jacksonVersion
+
+    compileOnly group: &apos;org.projectlombok&apos;, name: &apos;lombok&apos;, version: &apos;1.16.22&apos;
+}
+</code></pre><p>###属性命名<br>@JsonProperty注解指定一个属性用于JSON映射，默认情况下映射的JSON属性与注解的属性名称相同，不过可以使用该注解的value值修改JSON属性名，该注解还有一个index属性指定生成JSON属性的顺序，如果有必要的话。</p>
+<p>###属性包含<br>还有一些注解可以管理在映射JSON的时候包含或排除某些属性，下面介绍一下常用的几个。</p>
+<p>@JsonIgnore注解用于排除某个属性，这样该属性就不会被Jackson序列化和反序列化。</p>
+<p>@JsonIgnoreProperties注解是类注解。在序列化为JSON的时候，@JsonIgnoreProperties({“prop1”, “prop2”})会忽略pro1和pro2两个属性。在从JSON反序列化为Java类的时候，@JsonIgnoreProperties(ignoreUnknown=true)会忽略所有没有Getter和Setter的属性。该注解在Java类和JSON不完全匹配的时候很有用。</p>
+<p>@JsonIgnoreType也是类注解，会排除所有指定类型的属性。</p>
+<p>###序列化相关<br>@JsonPropertyOrder和@JsonProperty的index属性类似，指定属性序列化时的顺序。</p>
+<p>@JsonRootName注解用于指定JSON根属性的名称。</p>
+<p>###处理JSON</p>
+<p>###简单映射<br>我们用Lombok设置一个简单的Java类。</p>
+<pre><code>@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Friend {
+    private String nickname;
+    private int age;
+}
+</code></pre><p>然后就可以处理JSON数据了。首先需要一个ObjectMapper对象，序列化和反序列化都需要它。</p>
+<pre><code>ObjectMapper mapper = new ObjectMapper();
+Friend friend = new Friend(&quot;yitian&quot;, 25);
+
+// 写为字符串
+String text = mapper.writeValueAsString(friend);
+// 写为文件
+mapper.writeValue(new File(&quot;friend.json&quot;), friend);
+// 写为字节流
+byte[] bytes = mapper.writeValueAsBytes(friend);
+System.out.println(text);
+// 从字符串中读取
+Friend newFriend = mapper.readValue(text, Friend.class);
+// 从字节流中读取
+newFriend = mapper.readValue(bytes, Friend.class);
+// 从文件中读取
+newFriend = mapper.readValue(new File(&quot;friend.json&quot;), Friend.class);
+System.out.println(newFriend);
+</code></pre><p>程序结果如下。可以看到生成的JSON属性和Java类中定义的一致。</p>
+<pre><code>{&quot;nickname&quot;:&quot;yitian&quot;,&quot;age&quot;:25}
+Friend(nickname=yitian, age=25)
+</code></pre><p>###集合的映射</p>
+<p>除了使用Java类进行映射之外，我们还可以直接使用Map和List等Java集合组织JSON数据，在需要的时候可以使用readTree方法直接读取JSON中的某个属性值。需要注意的是从JSON转换为Map对象的时候，由于Java的类型擦除，所以类型需要我们手动用new TypeReference<t>给出。</t></p>
+<pre><code>ObjectMapper mapper = new ObjectMapper();
+
+Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+map.put(&quot;age&quot;, 25);
+map.put(&quot;name&quot;, &quot;yitian&quot;);
+map.put(&quot;interests&quot;, new String[]{&quot;pc games&quot;, &quot;music&quot;});
+
+String text = mapper.writeValueAsString(map);
+System.out.println(text);
+
+Map&lt;String, Object&gt; map2 = mapper.readValue(text, new TypeReference&lt;Map&lt;String, Object&gt;&gt;() {
+});
+System.out.println(map2);
+
+JsonNode root = mapper.readTree(text);
+String name = root.get(&quot;name&quot;).asText();
+int age = root.get(&quot;age&quot;).asInt();
+
+System.out.println(&quot;name:&quot; + name + &quot; age:&quot; + age);
+</code></pre><p>程序结果如下。</p>
+<pre><code>{&quot;name&quot;:&quot;yitian&quot;,&quot;interests&quot;:[&quot;pc games&quot;,&quot;music&quot;],&quot;age&quot;:25}
+{name=yitian, interests=[pc games, music], age=25}
+name:yitian age:25
+</code></pre><p>###Jackson配置</p>
+<p>Jackson预定义了一些配置，我们通过启用和禁用某些属性可以修改Jackson运行的某些行为。详细文档参考JacksonFeatures。下面我简单翻译一下Jackson README上列出的一些属性。</p>
+<pre><code>// 美化输出
+mapper.enable(SerializationFeature.INDENT_OUTPUT);
+// 允许序列化空的POJO类
+// （否则会抛出异常）
+mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+// 把java.util.Date, Calendar输出为数字（时间戳）
+mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+// 在遇到未知属性的时候不抛出异常
+mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+// 强制JSON 空字符串(&quot;&quot;)转换为null对象值:
+mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+
+// 在JSON中允许C/C++ 样式的注释(非标准，默认禁用)
+mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+// 允许没有引号的字段名（非标准）
+mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+// 允许单引号（非标准）
+mapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+// 强制转义非ASCII字符
+mapper.configure(JsonGenerator.Feature.ESCAPE_NON_ASCII, true);
+// 将内容包裹为一个JSON属性，属性名由@JsonRootName注解指定
+mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, true);
+</code></pre><p>这里有三个方法，configure方法接受配置名和要设置的值，Jackson 2.5版本新加的enable和disable方法则直接启用和禁用相应属性，推荐使用后面两个方法。</p>
+<p>###用注解管理映射</p>
+<p>前面介绍了一些Jackson注解，下面来应用一下这些注解。首先来看看使用了注解的Java类。</p>
+<pre><code>@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonRootName(&quot;FriendDetail&quot;)
+@JsonIgnoreProperties({&quot;uselessProp1&quot;, &quot;uselessProp3&quot;})
+public class FriendDetail {
+    @JsonProperty(&quot;NickName&quot;)
+    private String name;
+    @JsonProperty(&quot;Age&quot;)
+    private int age;
+    private String uselessProp1;
+    @JsonIgnore
+    private int uselessProp2;
+    private String uselessProp3;
+}
+</code></pre><p>然后看看代码。需要注意的是，由于设置了排除的属性，所以生成的JSON和Java类并不是完全对应关系，所以禁用DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES是必要的。</p>
+<pre><code>ObjectMapper mapper = new ObjectMapper();
+//mapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+FriendDetail fd = new FriendDetail(&quot;yitian&quot;, 25, &quot;&quot;, 0, &quot;&quot;);
+String text = mapper.writeValueAsString(fd);
+System.out.println(text);
+
+FriendDetail fd2 = mapper.readValue(text, FriendDetail.class);
+System.out.println(fd2);
+</code></pre><p>运行结果如下。可以看到生成JSON的时候忽略了我们制定的值，而且在转换为Java类的时候对应的属性为空。</p>
+<pre><code>{&quot;NickName&quot;:&quot;yitian&quot;,&quot;Age&quot;:25}
+FriendDetail(name=yitian, age=25, uselessProp1=null, uselessProp2=0, uselessProp3=null)
+</code></pre><p>##处理XML</p>
+<p>Jackson是一个处理JSON的类库，不过它也通过jackson-dataformat-xml包提供了处理XML的功能。Jackson建议我们在处理XML的时候使用woodstox-core包，它是一个XML的实现，比JDK自带XML实现更加高效，也更加安全。</p>
+<p>这里有个注意事项，如果你正在使用Java 9以上的JDK，可能会出现java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException异常，这是因为Java 9实现了JDK的模块化，将原本和JDK打包在一起的JAXB实现分隔出来。所以这时候需要我们手动添加JAXB的实现。在Gradle中添加下面的代码即可。</p>
+<pre><code>compile group: &apos;javax.xml.bind&apos;, name: &apos;jaxb-api&apos;, version: &apos;2.3.0&apos;
+</code></pre><p>###注解</p>
+<p>Jackson XML除了使用Jackson JSON和JDK JAXB的一些注解之外，自己也定义了一些注解。下面简单介绍一下几个常用注解。</p>
+<p>@JacksonXmlProperty注解有三个属性，namespace和localname属性用于指定XML命名空间的名称，isAttribute指定该属性作为XML的属性（）还是作为子标签（）.</p>
+<p>@JacksonXmlRootElement注解有两个属性，namespace和localname属性用于指定XML根元素命名空间的名称。</p>
+<p>@JacksonXmlText注解将属性直接作为未被标签包裹的普通文本表现。</p>
+<p>@JacksonXmlCData将属性包裹在CDATA标签中。</p>
+<p>###XML映射</p>
+<p>新建如下一个Java类。</p>
+<pre><code>@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonRootName(&quot;Person&quot;)
+public class Person {
+    @JsonProperty(&quot;Name&quot;)
+    private String name;
+    @JsonProperty(&quot;NickName&quot;)
+    //@JacksonXmlText
+    private String nickname;
+    @JsonProperty(&quot;Age&quot;)
+    private int age;
+    @JsonProperty(&quot;IdentityCode&quot;)
+    @JacksonXmlCData
+    private String identityCode;
+    @JsonProperty(&quot;Birthday&quot;)
+    //@JacksonXmlProperty(isAttribute = true)
+    @JsonFormat(pattern = &quot;yyyy/MM/DD&quot;)
+    private LocalDate birthday;
+
+}
+</code></pre><p>下面是代码示例，基本上和JSON的API非常相似，XmlMapper实际上就是ObjectMapper的子类。</p>
+<pre><code>Person p1 = new Person(&quot;yitian&quot;, &quot;易天&quot;, 25, &quot;10000&quot;, LocalDate.of(1994, 1, 1));
+XmlMapper mapper = new XmlMapper();
+mapper.findAndRegisterModules();
+mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+mapper.enable(SerializationFeature.INDENT_OUTPUT);
+String text = mapper.writeValueAsString(p1);
+System.out.println(text);
+
+Person p2 = mapper.readValue(text, Person.class);
+System.out.println(p2);
+</code></pre><p>运行结果如下。</p>
+<pre><code>&lt;Person&gt;
+  &lt;Name&gt;yitian&lt;/Name&gt;
+  &lt;NickName&gt;易天&lt;/NickName&gt;
+  &lt;Age&gt;25&lt;/Age&gt;
+  &lt;IdentityCode&gt;&lt;![CDATA[10000]]&gt;&lt;/IdentityCode&gt;
+  &lt;Birthday&gt;1994/01/01&lt;/Birthday&gt;
+&lt;/Person&gt;
+
+Person(name=yitian, nickname=易天, age=25, identityCode=10000, birthday=1994-01-01)
+</code></pre><p>如果取消那两行注释，那么运行结果如下。可以看到Jackson XML注解对生成的XML的控制效果。</p>
+<pre><code>&lt;Person birthday=&quot;1994/01/01&quot;&gt;
+  &lt;Name&gt;yitian&lt;/Name&gt;易天
+  &lt;Age&gt;25&lt;/Age&gt;
+  &lt;IdentityCode&gt;&lt;![CDATA[10000]]&gt;&lt;/IdentityCode&gt;
+&lt;/Person&gt;
+
+Person(name=yitian, nickname=null, age=25, identityCode=10000, birthday=1994-01-01)
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/" data-id="cjw1zeq6r0004t4v8bzaabx39" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/my-blog/2019/05/10/git回滚远程仓库/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">git回滚远程仓库</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/04/">April 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/my-blog/2019/05/24/Jackson快速入门/">jackson 快速入门</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/05/10/git回滚远程仓库/">git回滚远程仓库</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/">《Java 8 in Action》Chapter 12：新的日期和时间API</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/04/19/java 10 新特性/">JAVA 10</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/04/19/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/my-blog/" class="mobile-nav-link">Home</a>
+  
+    <a href="/my-blog/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/my-blog/fancybox/jquery.fancybox.css">
+  <script src="/my-blog/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/my-blog/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
