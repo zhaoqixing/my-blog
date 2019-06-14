@@ -62,6 +62,471 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-commons-lang3-3.2.jar中的常用工具类的使用" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/my-blog/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/" class="article-date">
+  <time datetime="2019-06-14T13:15:14.379Z" itemprop="datePublished">2019-06-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/my-blog/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/">commons-lang3-3.2.jar中的常用工具类的使用</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、StringUtils工具类"><a href="#1、StringUtils工具类" class="headerlink" title="1、StringUtils工具类"></a>1、StringUtils工具类</h4><p>可以判断是否是空串，是否为null，默认值设置等操作:</p>
+<pre><code>/**
+     * StringUtils
+     */
+    public static void test1() {
+        System.out.println(StringUtils.isBlank(&quot;   &quot;));// true----可以验证null, &quot;&quot;,&quot; &quot;等
+        System.out.println(StringUtils.isBlank(&quot;null&quot;));// false
+        System.out.println(StringUtils.isAllLowerCase(&quot;null&quot;));// t
+        System.out.println(StringUtils.isAllUpperCase(&quot;XXXXXX&quot;));// t
+        System.out.println(StringUtils.isEmpty(&quot; &quot;));// f---为null或者&quot;&quot;返回true
+        System.out.println(StringUtils.defaultIfEmpty(null, &quot;default&quot;));// 第二个参数是第一个为null或者&quot;&quot;的时候的取值
+        System.out.println(StringUtils.defaultIfBlank(&quot;    &quot;, &quot;default&quot;));//// 第二个参数是第一个为null或者&quot;&quot;或者&quot;   &quot;的时候的取值
+    }
+</code></pre><p>isBlank()  可以验证空格、null、””，如果是好几个空格也返回true</p>
+<p>isEmpty验证不了空格，只有值为null和””返回true </p>
+<p>两者都验证不了”null”字符串，所以如果验证”null”还需要自己用equals进行验证。</p>
+<pre><code>结果:
+
+true
+false
+true
+true
+false
+default
+default
+</code></pre><p>简单的贴出几个源码便于记录:</p>
+<pre><code>public static boolean isBlank(final CharSequence cs) {
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i &lt; strLen; i++) {
+            if (Character.isWhitespace(cs.charAt(i)) == false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isEmpty(final CharSequence cs) {
+        return cs == null || cs.length() == 0;
+    }
+
+
+       public static String defaultIfEmpty(String str, String defaultStr) {
+            return StringUtils.isEmpty(str) ? defaultStr : str;
+        }
+</code></pre><p>CharSequence是一个接口，String,StringBuffer,StringBuilder等都实现了此接口</p>
+<pre><code>public abstract interface CharSequence {
+    public abstract int length();
+
+    public abstract char charAt(int paramInt);
+
+    public abstract CharSequence subSequence(int paramInt1, int paramInt2);
+
+    public abstract String toString();
+}
+</code></pre><p>补充:StringUtils页可以将集合转为String，并且以指定符号链接里面的数据</p>
+<pre><code>List list = new ArrayList(2);
+        list.add(&quot;张三&quot;);
+        list.add(&quot;李四&quot;);
+        list.add(&quot;王五&quot;);
+        String list2str = StringUtils.join(list, &quot;,&quot;);
+        System.out.println(list2str);
+
+结果:
+
+　　张三,李四,王五
+</code></pre><p>补充:有时候我们希望给拼接后的字符串都加上单引号，这个在拼接SQL  in条件的时候非常有用，例如:</p>
+<pre><code>    //需求:将逗号里面的内容都加上单引号
+    String string = &quot;111,222,333&quot;;
+    string = &quot;&apos;&quot;+string+&quot;&apos;&quot;;//字符串前后加&apos;
+    string = StringUtils.join(string.split(&quot;,&quot;),&quot;&apos;,&apos;&quot;);//先按逗号分隔为数组，然后用&apos;,&apos;连接数组
+    System.out.println(string);
+
+结果:
+
+&apos;111&apos;,&apos;222&apos;,&apos;333&apos;
+</code></pre><p>补充:String.format(format,Object)也可以对字符串进行格式化，例如在数字前面补齐数字</p>
+<pre><code>        int num = 50;
+        String format = String.format(&quot;%0&quot; + 5 + &quot;d&quot;, num);
+        System.out.println(format);
+
+结果:
+
+00050
+</code></pre><p>补充:StringUtils也可以截取字符串,判断是否大小写等操作</p>
+<pre><code>String string = &quot;123_45_43_ss&quot;;
+        System.out.println(StringUtils.isAllLowerCase(string));// 判断全部小写
+        System.out.println(StringUtils.isAllUpperCase(string));// 判断全部大写
+        System.out.println(StringUtils.substringAfter(string, &quot;123&quot;));// 截取123之后的
+        System.out.println(StringUtils.substringBefore(string, &quot;45&quot;));// 截取45之前的
+        System.out.println(StringUtils.substringBefore(string, &quot;_&quot;));// 截取第一个_之前的
+        System.out.println(StringUtils.substringBeforeLast(string, &quot;_&quot;));// 截取最后一个_之前的
+        System.out.println(StringUtils.substringAfter(string, &quot;_&quot;));// 截取第一个_之后的
+        System.out.println(StringUtils.substringAfterLast(string, &quot;_&quot;));// 截取最后一个_之后的
+        System.out.println(StringUtils.substringBetween(&quot;1234565432123456&quot;, &quot;2&quot;, &quot;6&quot;));// 截取两个之间的(都找的是第一个)
+</code></pre><h4 id="2-StringEscapeUtils———-转义字符串的工具类"><a href="#2-StringEscapeUtils———-转义字符串的工具类" class="headerlink" title="2.StringEscapeUtils———-转义字符串的工具类"></a>2.StringEscapeUtils———-转义字符串的工具类</h4><pre><code>/**
+     * StringEscapeUtils
+     */
+    public static  void test2(){
+        //1.防止sql注入------原理是将&apos;替换为&apos;&apos;
+        System.out.println(org.apache.commons.lang.StringEscapeUtils.escapeSql(&quot;sss&quot;));
+        //2.转义/反转义html
+        System.out.println( org.apache.commons.lang.StringEscapeUtils.escapeHtml(&quot;&lt;a&gt;dddd&lt;/a&gt;&quot;));   //&amp;lt;a&amp;gt;dddd&amp;lt;/a&amp;gt;
+        System.out.println(org.apache.commons.lang.StringEscapeUtils.unescapeHtml(&quot;&amp;lt;a&amp;gt;dddd&amp;lt;/a&amp;gt;&quot;));  //&lt;a&gt;dddd&lt;/a&gt;
+        //3.转义/反转义JS
+        System.out.println(org.apache.commons.lang.StringEscapeUtils.escapeJavaScript(&quot;&lt;script&gt;alert(&apos;1111&apos;)&lt;/script&gt;&quot;));   
+        //4.把字符串转为unicode编码
+        System.out.println(org.apache.commons.lang.StringEscapeUtils.escapeJava(&quot;中国&quot;));   
+        System.out.println(org.apache.commons.lang.StringEscapeUtils.unescapeJava(&quot;\u4E2D\u56FD&quot;));  
+        //5.转义JSON
+        System.out.println(org.apache.commons.lang3.StringEscapeUtils.escapeJson(&quot;{name:&apos;qlq&apos;}&quot;));   
+    }
+</code></pre><h4 id="3-NumberUtils——–字符串转数据或者判断字符串是否是数字常用工具类"><a href="#3-NumberUtils——–字符串转数据或者判断字符串是否是数字常用工具类" class="headerlink" title="3.NumberUtils——–字符串转数据或者判断字符串是否是数字常用工具类"></a>3.NumberUtils——–字符串转数据或者判断字符串是否是数字常用工具类</h4><pre><code>/**
+     * NumberUtils
+     */
+    public static  void test3(){
+        System.out.println(NumberUtils.isNumber(&quot;231232.8&quot;));//true---判断是否是数字
+        System.out.println(NumberUtils.isDigits(&quot;2312332.5&quot;));//false，判断是否是整数
+        System.out.println(NumberUtils.toDouble(null));//如果传的值不正确返回一个默认值，字符串转double，传的不正确会返回默认值
+        System.out.println(NumberUtils.createBigDecimal(&quot;333333&quot;));//字符串转bigdecimal
+    }
+</code></pre><h4 id="4-BooleanUtils————判断Boolean类型工具类"><a href="#4-BooleanUtils————判断Boolean类型工具类" class="headerlink" title="4.BooleanUtils————判断Boolean类型工具类"></a>4.BooleanUtils————判断Boolean类型工具类</h4><pre><code>/**
+     * BooleanUtils
+     */
+    public static  void test4(){
+        System.out.println(BooleanUtils.isFalse(true));//false
+        System.out.println(BooleanUtils.toBoolean(&quot;yes&quot;));//true
+        System.out.println(BooleanUtils.toBooleanObject(0));//false
+        System.out.println(BooleanUtils.toStringYesNo(false));//no
+        System.out.println(BooleanUtils.toBooleanObject(&quot;ok&quot;, &quot;ok&quot;, &quot;error&quot;, &quot;null&quot;));//true-----第一个参数是需要验证的字符串，第二个是返回true的值，第三个是返回false的值，第四个是返回null的值
+    }
+</code></pre><h4 id="5-SystemUtils—-获取系统信息-原理都是调用System-getProperty"><a href="#5-SystemUtils—-获取系统信息-原理都是调用System-getProperty" class="headerlink" title="5.SystemUtils—-获取系统信息(原理都是调用System.getProperty())"></a>5.SystemUtils—-获取系统信息(原理都是调用System.getProperty())</h4><pre><code>/**
+     * SystemUtils
+     */
+    public static  void test5(){
+        System.out.println(SystemUtils.getJavaHome());
+        System.out.println(SystemUtils.getJavaIoTmpDir());
+        System.out.println(SystemUtils.getUserDir());
+        System.out.println(SystemUtils.getUserHome());
+        System.out.println(SystemUtils.JAVA_VERSION);
+        System.out.println(SystemUtils.OS_NAME);
+        System.out.println(SystemUtils.USER_TIMEZONE);
+    }
+</code></pre><h4 id="6-DateUtils和DateFormatUtils可以实现字符串转date与date转字符串-date比较先后问题"><a href="#6-DateUtils和DateFormatUtils可以实现字符串转date与date转字符串-date比较先后问题" class="headerlink" title="6.DateUtils和DateFormatUtils可以实现字符串转date与date转字符串,date比较先后问题"></a>6.DateUtils和DateFormatUtils可以实现字符串转date与date转字符串,date比较先后问题</h4><p>DateUtils也可以判断是否是同一天等操作。</p>
+<pre><code>package zd.dms.test;
+
+import java.text.ParseException;
+import java.util.Date;
+
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
+
+public class PlainTest {
+    public static void main(String[] args) {
+        // DateFormatUtils----date转字符串
+        Date date = new Date();
+        System.out.println(DateFormatUtils.format(date, &quot;yyyy-MM-dd hh:mm:ss&quot;));// 小写的是12小时制
+        System.out.println(DateFormatUtils.format(date, &quot;yyyy-MM-dd HH:mm:ss&quot;));// 大写的HH是24小时制
+
+        // DateUtils ---加减指定的天数(也可以加减秒、小时等操作)
+        Date addDays = DateUtils.addDays(date, 2);
+        System.out.println(DateFormatUtils.format(addDays, &quot;yyyy-MM-dd HH:mm:ss&quot;));
+        Date addDays2 = DateUtils.addDays(date, -2);
+        System.out.println(DateFormatUtils.format(addDays2, &quot;yyyy-MM-dd HH:mm:ss&quot;));
+
+        // 原生日期判断日期先后顺序
+        System.out.println(addDays2.after(addDays));
+        System.out.println(addDays2.before(addDays));
+
+        // DateUtils---字符串转date
+        String strDate = &quot;2018-11-01 19:23:44&quot;;
+        try {
+            Date parseDateStrictly = DateUtils.parseDateStrictly(strDate, &quot;yyyy-MM-dd HH:mm:ss&quot;);
+            Date parseDate = DateUtils.parseDate(strDate, &quot;yyyy-MM-dd HH:mm:ss&quot;);
+            System.out.println(parseDateStrictly);
+            System.out.println(parseDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><h4 id="7-StopWatch提供秒表的计时-暂停等功能"><a href="#7-StopWatch提供秒表的计时-暂停等功能" class="headerlink" title="7.StopWatch提供秒表的计时,暂停等功能"></a>7.StopWatch提供秒表的计时,暂停等功能</h4><pre><code>package cn.xm.exam.test;
+
+import org.apache.commons.lang.time.StopWatch;
+
+public class test implements AInterface, BInterface {
+    public static void main(String[] args) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        try {
+            Thread.sleep(5 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        stopWatch.stop();
+        System.out.println(stopWatch.getStartTime());// 获取开始时间
+        System.out.println(stopWatch.getTime());// 获取总的执行时间--单位是毫秒
+    }
+}
+</code></pre><h4 id="8-以Range结尾的类主要提供一些范围的操作-包括判断某些字符-数字等是否在这个范围以内"><a href="#8-以Range结尾的类主要提供一些范围的操作-包括判断某些字符-数字等是否在这个范围以内" class="headerlink" title="8.以Range结尾的类主要提供一些范围的操作,包括判断某些字符,数字等是否在这个范围以内"></a>8.以Range结尾的类主要提供一些范围的操作,包括判断某些字符,数字等是否在这个范围以内</h4><pre><code>        IntRange intRange = new IntRange(1, 5);
+        System.out.println(intRange.getMaximumInteger());
+        System.out.println(intRange.getMinimumInteger());
+        System.out.println(intRange.containsInteger(6));
+        System.out.println(intRange.containsDouble(3));
+
+结果:
+
+5
+1
+false
+true
+</code></pre><h4 id="9-ArrayUtils操作数组，功能强大，可以合并，判断是否包含等操作"><a href="#9-ArrayUtils操作数组，功能强大，可以合并，判断是否包含等操作" class="headerlink" title="9.ArrayUtils操作数组，功能强大，可以合并，判断是否包含等操作"></a>9.ArrayUtils操作数组，功能强大，可以合并，判断是否包含等操作</h4><pre><code>package cn.xm.exam.test;
+
+import org.apache.commons.lang.ArrayUtils;
+
+public class test implements AInterface, BInterface {
+    public static void main(String[] args) {
+        int array[] = { 1, 5, 5, 7 };
+        System.out.println(array);
+
+        // 增加元素
+        array = ArrayUtils.add(array, 9);
+        System.out.println(ArrayUtils.toString(array));
+
+        // 删除元素
+        array = ArrayUtils.remove(array, 3);
+        System.out.println(ArrayUtils.toString(array));
+
+        // 反转数组
+        ArrayUtils.reverse(array);
+        System.out.println(ArrayUtils.toString(array));
+
+        // 查询数组索引
+        System.out.println(ArrayUtils.indexOf(array, 5));
+
+        // 判断数组中是否包含指定值
+        System.out.println(ArrayUtils.contains(array, 5));
+
+        // 合并数组
+        array = ArrayUtils.addAll(array, new int[] { 1, 5, 6 });
+        System.out.println(ArrayUtils.toString(array));
+    }
+}
+</code></pre><h4 id="8-反射工具类的使用"><a href="#8-反射工具类的使用" class="headerlink" title="8.  反射工具类的使用"></a>8.  反射工具类的使用</h4><p>一个普通的java:</p>
+<pre><code>package cn.xm.exam.test.p1;
+
+public class Person {
+    private String name;
+
+    public static void staticMet(String t) {
+        System.out.println(t);
+    }
+
+    public Person(String name) {
+        this.name = name;
+    }
+
+    public String call(String string) {
+        System.out.println(name);
+        System.out.println(string);
+        return string;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;test [name=&quot; + name + &quot;]&quot;;
+    }
+}
+</code></pre><p>反射工具类操作:</p>
+<pre><code>package cn.xm.exam.test;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import org.apache.commons.lang.reflect.ConstructorUtils;
+import org.apache.commons.lang.reflect.FieldUtils;
+import org.apache.commons.lang.reflect.MethodUtils;
+
+import cn.xm.exam.test.p1.Person;
+
+public class test {
+
+    public static void main(String[] args) throws InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
+        // ConstructorUtils工具类的使用
+        Constructor accessibleConstructor = ConstructorUtils.getAccessibleConstructor(Person.class, String.class);
+        Person newInstance = (Person) accessibleConstructor.newInstance(&quot;test&quot;);
+        System.out.println(newInstance.getClass());
+        System.out.println(newInstance);
+
+        // MethodUtils的使用
+        Method accessibleMethod = MethodUtils.getAccessibleMethod(Person.class, &quot;call&quot;, String.class);
+        Object invoke = accessibleMethod.invoke(newInstance, &quot;参数&quot;);
+        System.out.println(invoke);
+        // 调用静态方法
+        MethodUtils.invokeStaticMethod(Person.class, &quot;staticMet&quot;, &quot;静态方法&quot;);
+
+        // FieldUtils 暴力获取私有变量(第三个参数表示是否强制获取)---反射方法修改元素的值
+        Field field = FieldUtils.getField(Person.class, &quot;name&quot;, true);
+        field.setAccessible(true);
+        System.out.println(field.getType());
+        field.set(newInstance, &quot;修改后的值&quot;);
+        System.out.println(newInstance.getName());
+    }
+}
+
+
+
+结果:
+
+class cn.xm.exam.test.p1.Person
+test [name=test]
+test
+参数
+参数
+静态方法
+class java.lang.String
+修改后的值
+</code></pre><h4 id="9-EqualsBuilder-可以用于拼接多个条件进行equals比较"><a href="#9-EqualsBuilder-可以用于拼接多个条件进行equals比较" class="headerlink" title="9.  EqualsBuilder 可以用于拼接多个条件进行equals比较"></a>9.  EqualsBuilder 可以用于拼接多个条件进行equals比较</h4><pre><code>EqualsBuilder equalsBuilder = new EqualsBuilder();
+        Integer integer1 = new Integer(1);
+        Integer integer2 = new Integer(1);
+
+        String string1 = &quot;111&quot;;
+        String string2 = &quot;111&quot;;
+        equalsBuilder.append(integer1, integer2);
+        equalsBuilder.append(string1, string2);
+        System.out.println(equalsBuilder.isEquals());
+</code></pre><p>结果:</p>
+<p>true</p>
+<h4 id="下面是commons-collections包中的常用的工具类"><a href="#下面是commons-collections包中的常用的工具类" class="headerlink" title="========下面是commons-collections包中的常用的工具类=="></a>========下面是commons-collections包中的常用的工具类==</h4><h4 id="1-CollectionUtils工具类用于操作集合-isEmpty-方法最有用-（commons-collections包中的类）"><a href="#1-CollectionUtils工具类用于操作集合-isEmpty-方法最有用-（commons-collections包中的类）" class="headerlink" title="1. CollectionUtils工具类用于操作集合,  isEmpty () 方法最有用   （commons-collections包中的类）"></a>1. CollectionUtils工具类用于操作集合,  isEmpty () 方法最有用   （commons-collections包中的类）</h4><pre><code>package cn.xm.exam.test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+
+public class test {
+    public static void main(String[] args) {
+        List&lt;String&gt; list = new ArrayList&lt;String&gt;();
+        list.add(&quot;str1&quot;);
+        list.add(&quot;str2&quot;);
+
+        List&lt;String&gt; list1 = new ArrayList&lt;String&gt;();
+        list1.add(&quot;str1&quot;);
+        list1.add(&quot;str21&quot;);
+
+        // 判断是否有任何一个相同的元素
+        System.out.println(CollectionUtils.containsAny(list, list1));
+
+        // 求并集(自动去重)
+        List&lt;String&gt; list3 = (List&lt;String&gt;) CollectionUtils.union(list, list1);
+        System.out.println(list3);
+
+        // 求交集(两个集合中都有的元素)
+        Collection intersection = CollectionUtils.intersection(list, list1);
+        System.out.println(&quot;intersection-&gt;&quot; + intersection);
+
+        // 求差集(并集去掉交集，也就是list中有list1中没有，list1中有list中没有)
+        Collection intersection1 = CollectionUtils.disjunction(list, list1);
+        System.out.println(&quot;intersection1-&gt;&quot; + intersection1);
+
+        // 获取一个同步的集合
+        Collection synchronizedCollection = CollectionUtils.synchronizedCollection(list);
+
+        // 验证集合是否为null或者集合的大小是否为0，同理有isNouEmpty方法
+        List list4 = null;
+        List list5 = new ArrayList&lt;&gt;();
+        System.out.println(CollectionUtils.isEmpty(list4));
+        System.out.println(CollectionUtils.isEmpty(list5));
+    }
+}
+</code></pre><h4 id="2-MapUtils工具类"><a href="#2-MapUtils工具类" class="headerlink" title="2.   MapUtils工具类"></a>2.   MapUtils工具类</h4><p>可以用于map判断null和size为0，也可以直接获取map中的值为指定类型，没有的返回null</p>
+<pre><code>package cn.xm.exam.test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.NumberUtils;
+
+import ognl.MapElementsAccessor;
+
+public class test {
+    public static void main(String[] args) {
+        Map map = null;
+        Map map2 = new HashMap();
+        Map map3 = new HashMap&lt;&gt;();
+        map3.put(&quot;xxx&quot;, &quot;xxx&quot;);
+        // 检验为empty可以验证null和size为0的情况
+        System.out.println(MapUtils.isEmpty(map));
+        System.out.println(MapUtils.isEmpty(map2));
+        System.out.println(MapUtils.isEmpty(map3));
+
+        String string = MapUtils.getString(map3, &quot;eee&quot;);
+        String string2 = MapUtils.getString(map3, &quot;xxx&quot;);
+        Integer integer = MapUtils.getInteger(map3, &quot;xxx&quot;);
+        System.out.println(&quot;string-&gt;&quot; + string);
+        System.out.println(&quot;string2-&gt;&quot; + string2);
+        System.out.println(&quot;integer-&gt;&quot; + integer);
+        System.out.println(integer == null);
+    }
+}
+</code></pre><p>结果:</p>
+<pre><code>true
+true
+false
+INFO: Exception: java.text.ParseException: Unparseable number: &quot;xxx&quot;
+string-&gt;null
+string2-&gt;xxx
+integer-&gt;null
+true
+</code></pre><p>补充:MapUtils也可以获取值作为String，获取不到取默认值:</p>
+<pre><code>//获取字符串,如果获取不到可以返回一个默认值
+String string3 = MapUtils.getString(map3, &quot;eee&quot;,&quot;没有值&quot;);
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/" data-id="cjww48tkx0007z8v8kzdiib1k" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Jackson相关" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/my-blog/2019/06/06/Jackson相关/" class="article-date">
@@ -377,7 +842,7 @@ private String remarks;//备注信息.
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/06/Jackson相关/" data-id="cjwkosdyb0004tgv8qbpqzy6b" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/06/Jackson相关/" data-id="cjww48tki0005z8v82n5argrb" class="article-share-link">Share</a>
       
       
     </footer>
@@ -602,7 +1067,7 @@ proxy 代理类的实例
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/31/代理模式/" data-id="cjwkosdyl0007tgv83e81wx1l" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/31/代理模式/" data-id="cjww48tky0008z8v8wk9buc2t" class="article-share-link">Share</a>
       
       
     </footer>
@@ -839,7 +1304,7 @@ Person(name=yitian, nickname=null, age=25, identityCode=10000, birthday=1994-01-
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/" data-id="cjwkosdyc0005tgv8jax0omet" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/" data-id="cjww48tkf0004z8v8lpjw2wc2" class="article-share-link">Share</a>
       
       
     </footer>
@@ -909,7 +1374,7 @@ git rebase --continue
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/10/git回滚远程仓库/" data-id="cjwkosdxu0000tgv8tgbeefjk" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/10/git回滚远程仓库/" data-id="cjww48tjv0001z8v8965yqptc" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1140,7 +1605,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/" data-id="cjwkosdyd0006tgv8f9e02b2h" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/" data-id="cjww48tkk0006z8v8ltvf3cmt" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1206,7 +1671,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjwkosdy10003tgv8xoclei8c" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjww48tjm0000z8v87yqtqfyg" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1251,7 +1716,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/hello-world/" data-id="cjwkosdxy0001tgv8jtwwi1ni" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/hello-world/" data-id="cjww48tk00003z8v8z4vjg7zc" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1287,7 +1752,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/测试/" data-id="cjwkosdy00002tgv8sz0p3ngw" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/测试/" data-id="cjww48tjz0002z8v8sx07zx5c" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1328,6 +1793,10 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       <ul>
         
           <li>
+            <a href="/my-blog/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/">commons-lang3-3.2.jar中的常用工具类的使用</a>
+          </li>
+        
+          <li>
             <a href="/my-blog/2019/06/06/Jackson相关/">jackson 相关认识</a>
           </li>
         
@@ -1341,10 +1810,6 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
         
           <li>
             <a href="/my-blog/2019/05/10/git回滚远程仓库/">git回滚远程仓库</a>
-          </li>
-        
-          <li>
-            <a href="/my-blog/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/">《Java 8 in Action》Chapter 12：新的日期和时间API</a>
           </li>
         
       </ul>
