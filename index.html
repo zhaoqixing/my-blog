@@ -62,6 +62,172 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-适配器模式" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/my-blog/2019/06/21/适配器模式/" class="article-date">
+  <time datetime="2019-06-21T11:12:30.389Z" itemprop="datePublished">2019-06-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/my-blog/2019/06/21/适配器模式/">适配器模式</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1、概述"><a href="#1、概述" class="headerlink" title="1、概述"></a>1、概述</h4><pre><code>适配器模式将一个类的接口，转换为客户期望的另一个接口。适配器让原本不兼容的类可以合作无间
+</code></pre><h4 id="2、解决问题"><a href="#2、解决问题" class="headerlink" title="2、解决问题"></a>2、解决问题</h4><pre><code>从模式的定义中，我们看到适配器模式就是用来转换接口，解决不兼容问题的。想想我们现实生活中的适配器，最常用的就是手机充电器了，也叫做电源适配器，它把家用交流强电转换为手机用的直流弱电。其中交流电就是被适配者，充电器是适配器，手机是用电客户。
+</code></pre><h4 id="3、成员角色"><a href="#3、成员角色" class="headerlink" title="3、成员角色"></a>3、成员角色</h4><pre><code>　客户（Client）：只能调用目标接口功能，不能直接使用被适配器，但可以通过适配器的接口转换间接使用被适配器。
+
+　　目标接口（Target）：客户看到的接口，适配器必须实现该接口才能被客户使用。
+
+　　适配器（Adapter）：适配器把被适配者接口转换为目标接口，提供给客户使用。
+
+　　被适配者（Adaptee）：被适配者接口与目标接口不兼容，需要适配器转换成目标接口子类，才能被客户使用。
+</code></pre><h4 id="4、应用实例"><a href="#4、应用实例" class="headerlink" title="4、应用实例"></a>4、应用实例</h4><p>下面用鸟叫和鸟飞的例子解析适配器模式，鹦鹉会叫也会飞，但鹅就只会叫不会飞，而且鹅也不是鸟类，我们要创建一个适配器，把鹅转换成鸟。</p>
+<p>　　第一步、创建鸟接口，对应角色目标接口</p>
+<pre><code>package adapter.pattern;
+
+//鸟接口
+public interface Bird {
+    //鸟叫
+    public void chirp();
+    //飞
+    public void fly();
+}
+</code></pre><p>第二步、创建鹦鹉类</p>
+<pre><code>package adapter.pattern;
+
+//鹦鹉类实现鸟接口
+public class Parrot implements Bird{
+
+    public void chirp() {
+        System.out.println(&quot;呜呜呜&quot;);     
+    }
+
+    public void fly() {
+        System.out.println(&quot;我能飞很远很远&quot;);     
+    }
+
+}
+</code></pre><p>第三步、创建鹅类，对应角色被适配者</p>
+<pre><code>package adapter.pattern;
+
+//鹅类，不是鸟
+public class Goose {
+    //鹅会叫但不会飞，没有飞的方法
+    public void chirp(){
+        System.out.println(&quot;嘎嘎嘎&quot;);
+    }
+}
+</code></pre><p>第四步、创建适配器</p>
+<pre><code>package adapter.pattern;
+
+//适配器，把鹅类适配为鸟
+public class GooseAdapter implements Bird{
+    //组合鹅类
+    Goose goose;
+    public GooseAdapter(Goose goose){
+        this.goose = goose;
+    }
+
+    public void chirp() {
+        if(goose != null){
+            //调用鸟叫的时候委托鹅叫
+            goose.chirp();
+        }
+    }
+
+    public void fly() {
+        //不支持该操作，可以抛出该异常，客户可以知道详情
+        throw new UnsupportedOperationException();
+    }
+
+}
+</code></pre><p>第五步、测试适配器</p>
+<pre><code>package adapter.pattern;
+
+public class AdapterTest {
+    public static void main(String[] args){
+        System.out.println(&quot;-----鹦鹉会叫也会飞-----&quot;);
+        Bird parrot = new Parrot();
+        parrot.chirp();
+        parrot.fly();
+
+        System.out.println(&quot;-----鹅会叫但不会飞-----&quot;);
+        Goose goose = new Goose();
+        Bird gooseAdapter = new GooseAdapter(goose);
+        gooseAdapter.chirp();
+        gooseAdapter.fly();
+
+
+    }
+}
+
+ -----鹦鹉会叫也会飞-----
+ 呜呜呜
+ -----鹅会叫但不会飞-----
+ 嘎嘎嘎
+</code></pre><p>适配器在java中的例子，我们知道ArrayList类实现了迭代器（Iterator），但不支持枚举（Enumeration），下面我们就来实现ArrayList的枚举操作。</p>
+<pre><code>package adapter.pattern;
+
+import java.util.ArrayList;
+import java.util.Enumeration;
+
+public class ItertorEnumeration implements Enumeration{
+    //组合被适配者
+    private ArrayList&lt;String&gt; list;
+    //集合的计数器，判断指针指向集合的位置
+    private int index = 0;
+    public ItertorEnumeration(ArrayList&lt;String&gt; list){
+        this.list = list;
+    }
+    public boolean hasMoreElements() {
+        if(list != null &amp;&amp; list.size() &gt; index){
+            return true;
+        }
+        return false;
+    }
+
+    public Object nextElement() {
+        String content = list.get(index);
+        index++;
+        return content;
+    }
+}
+</code></pre><h4 id="优点和缺点"><a href="#优点和缺点" class="headerlink" title="优点和缺点"></a>优点和缺点</h4><p>　　1、优点</p>
+<p>　　（1）、转换接口，适配器让不兼容的接口变成兼容。</p>
+<p>　　（2）、让客户和实现的接口解耦。有了适配器，客户端每次调用不兼容的接口时，不用修改自己的代码，只要调用适合的适配器就可以了。</p>
+<p>　　（3）、使用了对象组合设计原则。以组合的方式包装被适配者，被适配者的任何子类都可以搭配着同一个适配器使用。</p>
+<p>　　（4）、体现了“开闭”原则。适配器模式把客户和接口绑定起来，而不是和具体实现绑定，我们可以使用多个配适器来转换多个后台类，也可以很容易地增加新的适配器。</p>
+<p>　　2、缺点</p>
+<p>　　（1）、每个被适配者都需要一个适配器，当适配器过多时会增加系统复杂度，降低运行时的性能。</p>
+<p>　　（2）、实现一个适配器可能需要下一番功夫，增加开发的难度。</p>
+<h4 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h4><p>1、当要使用的两个类所做的事情相同或者相似，但是具有不同的接口时考虑使用配适器模式。</p>
+<p>　　2、当需要统一客户端调用接口的代码，而所调用的接口具有不兼容问题时使用适配器模式。这样客户端只有调用一个接口就行了，这样可以更简单、更直接、更紧凑。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/21/适配器模式/" data-id="cjx5zxgxm00015sv8146nlfgh" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-commons-lang3-3.2.jar中的常用工具类的使用" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/my-blog/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/" class="article-date">
@@ -517,7 +683,7 @@ String string3 = MapUtils.getString(map3, &quot;eee&quot;,&quot;没有值&quot;)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/" data-id="cjww48tkx0007z8v8kzdiib1k" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/" data-id="cjx5zxgyb00095sv80lt5dsae" class="article-share-link">Share</a>
       
       
     </footer>
@@ -842,7 +1008,7 @@ private String remarks;//备注信息.
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/06/Jackson相关/" data-id="cjww48tki0005z8v82n5argrb" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/06/Jackson相关/" data-id="cjx5zxgy100055sv8oxu0lcpi" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1067,7 +1233,7 @@ proxy 代理类的实例
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/31/代理模式/" data-id="cjww48tky0008z8v8wk9buc2t" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/31/代理模式/" data-id="cjx5zxgy400075sv8ne39iict" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1304,7 +1470,7 @@ Person(name=yitian, nickname=null, age=25, identityCode=10000, birthday=1994-01-
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/" data-id="cjww48tkf0004z8v8lpjw2wc2" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/" data-id="cjx5zxgy300065sv88g8ahiwg" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1374,7 +1540,7 @@ git rebase --continue
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/10/git回滚远程仓库/" data-id="cjww48tjv0001z8v8965yqptc" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/10/git回滚远程仓库/" data-id="cjx5zxgxh00005sv8v9c1kiqu" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1605,7 +1771,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/" data-id="cjww48tkk0006z8v8ltvf3cmt" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/" data-id="cjx5zxgya00085sv8995bwdlm" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1671,7 +1837,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjww48tjm0000z8v87yqtqfyg" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjx5zxgxq00045sv88j49i5p0" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1716,7 +1882,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/hello-world/" data-id="cjww48tk00003z8v8z4vjg7zc" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/hello-world/" data-id="cjx5zxgxp00035sv8v3cmkow4" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1752,7 +1918,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/测试/" data-id="cjww48tjz0002z8v8sx07zx5c" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/测试/" data-id="cjx5zxgxo00025sv870jslpf3" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1793,6 +1959,10 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       <ul>
         
           <li>
+            <a href="/my-blog/2019/06/21/适配器模式/">适配器模式</a>
+          </li>
+        
+          <li>
             <a href="/my-blog/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/">commons-lang3-3.2.jar中的常用工具类的使用</a>
           </li>
         
@@ -1806,10 +1976,6 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
         
           <li>
             <a href="/my-blog/2019/05/24/Jackson快速入门/">jackson 快速入门</a>
-          </li>
-        
-          <li>
-            <a href="/my-blog/2019/05/10/git回滚远程仓库/">git回滚远程仓库</a>
           </li>
         
       </ul>
