@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>RabbitMQ数据丢失问题，Spring Boot实现confirm机制及ack消费端主动回调 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1:说明：ACK是默认是自动，在消息发送给消费者后立即确认。所以若消费端消费业务逻辑抛出异常，会可能丢失消息。即便加入事务回滚了也只保证数据的一致性，而消息依然丢失。所以，若消费端未成功处理此条消息，消息就会丢失。  NONE（默认）：自动；AUTO：根据情况确认；MANUAL：手动确认 2:yml配置：spring: rabbitmq: host: 127.0.0.1  port: 5672">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RabbitMQ数据丢失问题，Spring Boot实现confirm机制及ack消费端主动回调">
+<meta property="og:url" content="https://github.com/zhaoqixing/my-blog.git/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1:说明：ACK是默认是自动，在消息发送给消费者后立即确认。所以若消费端消费业务逻辑抛出异常，会可能丢失消息。即便加入事务回滚了也只保证数据的一致性，而消息依然丢失。所以，若消费端未成功处理此条消息，消息就会丢失。  NONE（默认）：自动；AUTO：根据情况确认；MANUAL：手动确认 2:yml配置：spring: rabbitmq: host: 127.0.0.1  port: 5672">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-06-28T11:11:53.264Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RabbitMQ数据丢失问题，Spring Boot实现confirm机制及ack消费端主动回调">
+<meta name="twitter:description" content="1:说明：ACK是默认是自动，在消息发送给消费者后立即确认。所以若消费端消费业务逻辑抛出异常，会可能丢失消息。即便加入事务回滚了也只保证数据的一致性，而消息依然丢失。所以，若消费端未成功处理此条消息，消息就会丢失。  NONE（默认）：自动；AUTO：根据情况确认；MANUAL：手动确认 2:yml配置：spring: rabbitmq: host: 127.0.0.1  port: 5672">
+  
+    <link rel="alternate" href="/my-blog/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/my-blog/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/my-blog/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/my-blog/">Home</a>
+        
+          <a class="main-nav-link" href="/my-blog/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/my-blog/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/zhaoqixing/my-blog.git"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Spring Boot实现confirm机制及ack消费端主动回调" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/my-blog/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/" class="article-date">
+  <time datetime="2019-06-28T11:11:53.264Z" itemprop="datePublished">2019-06-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      RabbitMQ数据丢失问题，Spring Boot实现confirm机制及ack消费端主动回调
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1-说明：ACK是默认是自动，在消息发送给消费者后立即确认。所以若消费端消费业务逻辑抛出异常，会可能丢失消息。即便加入事务回滚了也只保证数据的一致性，而消息依然丢失。所以，若消费端未成功处理此条消息，消息就会丢失。"><a href="#1-说明：ACK是默认是自动，在消息发送给消费者后立即确认。所以若消费端消费业务逻辑抛出异常，会可能丢失消息。即便加入事务回滚了也只保证数据的一致性，而消息依然丢失。所以，若消费端未成功处理此条消息，消息就会丢失。" class="headerlink" title="1:说明：ACK是默认是自动，在消息发送给消费者后立即确认。所以若消费端消费业务逻辑抛出异常，会可能丢失消息。即便加入事务回滚了也只保证数据的一致性，而消息依然丢失。所以，若消费端未成功处理此条消息，消息就会丢失。"></a>1:说明：ACK是默认是自动，在消息发送给消费者后立即确认。所以若消费端消费业务逻辑抛出异常，会可能丢失消息。即便加入事务回滚了也只保证数据的一致性，而消息依然丢失。所以，若消费端未成功处理此条消息，消息就会丢失。</h4><p>  NONE（默认）：自动；AUTO：根据情况确认；MANUAL：手动确认</p>
+<h4 id="2-yml配置："><a href="#2-yml配置：" class="headerlink" title="2:yml配置："></a>2:yml配置：</h4><pre><code>spring: rabbitmq: host: 127.0.0.1 
+port: 5672 
+username: guest 
+password: guest 
+#发送确认 对应RabbitTemplate.ConfirmCallback接口 
+publisher-confirms: true 
+#发送失败回退，对应RabbitTemplate.ReturnCallback接口 
+publisher-returns: true 
+#手动提交ack 
+listener: 
+   direct: 
+       #NONE（默认）：自动；AUTO：根据情况确认；MANUAL：手动确认 
+       acknowledge-mode: manual 
+   simple: 
+       acknowledge-mode: manual
+</code></pre><h4 id="3-config配置："><a href="#3-config配置：" class="headerlink" title="3:config配置："></a>3:config配置：</h4><pre><code>@Configuration public class RabbitConfig { /**
+     * 定义一个队列
+     * @return
+     */ 
+     @Bean 
+     public Queue okongQueue() { 
+        return new Queue(&quot;user&quot;); 
+     } 
+     @Bean 
+     MessageConverter messageConverter() {
+        return new Jackson2JsonMessageConverter(); 
+     }
+ }
+</code></pre><h4 id="4-发送端："><a href="#4-发送端：" class="headerlink" title="4:发送端："></a>4:发送端：</h4><pre><code>@Service
+public class SenderService implements RabbitTemplate.ConfirmCallback,
+    RabbitTemplate.ReturnCallback {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    public void sendMq() throws InterruptedException {
+        this.rabbitTemplate.setConfirmCallback(this);
+        rabbitTemplate.convertAndSend(&quot;user&quot;, &quot;6666666&quot;);
+    }
+
+    @Override
+    public void confirm(CorrelationData correlationData, boolean ack,
+        String cause) {
+        System.out.println(&quot;=====已消费======&quot;);
+
+        if (ack) {
+            System.out.println(&quot;消息: &quot; + correlationData + &quot;，已经被ack成功&quot;);
+        } else {
+            System.out.println(&quot;消息: &quot; + correlationData + &quot;，nack，失败原因是：&quot; +
+                cause);
+        }
+    }
+
+    @Override
+    public void returnedMessage(Message message, int replyCode,
+        String replyText, String exchange, String routingKey) {
+        System.out.println(&quot;sender return success&quot; + message.toString());
+    }
+}
+</code></pre><h4 id="5：消费端"><a href="#5：消费端" class="headerlink" title="5：消费端"></a>5：消费端</h4><pre><code>@Service
+public class SenderService implements RabbitTemplate.ConfirmCallback,
+    RabbitTemplate.ReturnCallback {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    public void sendMq() throws InterruptedException {
+        this.rabbitTemplate.setConfirmCallback(this);
+        rabbitTemplate.convertAndSend(&quot;user&quot;, &quot;6666666&quot;);
+    }
+
+    @Override
+    public void confirm(CorrelationData correlationData, boolean ack,
+        String cause) {
+        System.out.println(&quot;=====已消费======&quot;);
+
+        if (ack) {
+            System.out.println(&quot;消息: &quot; + correlationData + &quot;，已经被ack成功&quot;);
+        } else {
+            System.out.println(&quot;消息: &quot; + correlationData + &quot;，nack，失败原因是：&quot; +
+                cause);
+        }
+    }
+
+    @Override
+    public void returnedMessage(Message message, int replyCode,
+        String replyText, String exchange, String routingKey) {
+        System.out.println(&quot;sender return success&quot; + message.toString());
+    }
+}
+</code></pre><p>还可指定以下处理方式，可参考api：</p>
+<pre><code>@Service
+public class SenderService implements RabbitTemplate.ConfirmCallback,
+    RabbitTemplate.ReturnCallback {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    public void sendMq() throws InterruptedException {
+        this.rabbitTemplate.setConfirmCallback(this);
+        rabbitTemplate.convertAndSend(&quot;user&quot;, &quot;6666666&quot;);
+    }
+
+    @Override
+    public void confirm(CorrelationData correlationData, boolean ack,
+        String cause) {
+        System.out.println(&quot;=====已消费======&quot;);
+
+        if (ack) {
+            System.out.println(&quot;消息: &quot; + correlationData + &quot;，已经被ack成功&quot;);
+        } else {
+            System.out.println(&quot;消息: &quot; + correlationData + &quot;，nack，失败原因是：&quot; +
+                cause);
+        }
+    }
+
+    @Override
+    public void returnedMessage(Message message, int replyCode,
+        String replyText, String exchange, String routingKey) {
+        System.out.println(&quot;sender return success&quot; + message.toString());
+    }
+}
+</code></pre><p>参数说明：</p>
+<p>basicAck 方法需要传递两个参数<br>deliveryTag（唯一标识 ID）：当一个消费者向 RabbitMQ 注册后，会建立起一个 Channel ，RabbitMQ 会用 basic.deliver 方法向消费者推送消息，这个方法携带了一个 delivery tag， 它代表了 RabbitMQ 向该 Channel 投递的这条消息的唯一标识 ID，是一个单调递增的正整数，delivery tag 的范围仅限于 Channel<br>multiple：为了减少网络流量，手动确认可以被批处理，当该参数为 true 时，则可以一次性确认 delivery_tag 小于等于传入值的所有消息</p>
+<p>basicNack方法需要传递三个参数<br>deliveryTag（唯一标识 ID）：同上<br>multiple：同上<br>requeue： true ：重回队列，false ：丢弃，我们在nack方法中必须设置 false，否则重发没有意义。</p>
+<p>basicReject方法需要传递两个参数<br>deliveryTag（唯一标识 ID）：同上<br>requeue：同上</p>
+<h4 id="6：指定控制层调用："><a href="#6：指定控制层调用：" class="headerlink" title="6：指定控制层调用："></a>6：指定控制层调用：</h4><pre><code>@Service
+public class SenderService implements RabbitTemplate.ConfirmCallback,
+    RabbitTemplate.ReturnCallback {
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    public void sendMq() throws InterruptedException {
+        this.rabbitTemplate.setConfirmCallback(this);
+        rabbitTemplate.convertAndSend(&quot;user&quot;, &quot;6666666&quot;);
+    }
+
+    @Override
+    public void confirm(CorrelationData correlationData, boolean ack,
+        String cause) {
+        System.out.println(&quot;=====已消费======&quot;);
+
+        if (ack) {
+            System.out.println(&quot;消息: &quot; + correlationData + &quot;，已经被ack成功&quot;);
+        } else {
+            System.out.println(&quot;消息: &quot; + correlationData + &quot;，nack，失败原因是：&quot; +
+                cause);
+        }
+    }
+
+    @Override
+    public void returnedMessage(Message message, int replyCode,
+        String replyText, String exchange, String routingKey) {
+        System.out.println(&quot;sender return success&quot; + message.toString());
+    }
+}
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/" data-id="cjxfzzow90000ywv8tac78cmh" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/my-blog/2019/06/21/适配器模式/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">适配器模式</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/04/">April 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/my-blog/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/">RabbitMQ数据丢失问题，Spring Boot实现confirm机制及ack消费端主动回调</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/06/21/适配器模式/">适配器模式</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/">commons-lang3-3.2.jar中的常用工具类的使用</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/06/06/Jackson相关/">jackson 相关认识</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/05/31/代理模式/">代理模式</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/my-blog/" class="mobile-nav-link">Home</a>
+  
+    <a href="/my-blog/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/my-blog/fancybox/jquery.fancybox.css">
+  <script src="/my-blog/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/my-blog/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
