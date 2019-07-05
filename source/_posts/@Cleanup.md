@@ -1,5 +1,5 @@
 ---
-title: @cleanup 自动资源管理
+title:  cleanup 自动资源管理
 ---
 没有麻烦和安全地调用您的close()方法.
 
