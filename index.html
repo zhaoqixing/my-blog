@@ -62,6 +62,87 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Cleanup" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/my-blog/2019/07/05/Cleanup/" class="article-date">
+  <time datetime="2019-07-05T10:47:14.741Z" itemprop="datePublished">2019-07-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/my-blog/2019/07/05/Cleanup/">cleanup 自动资源管理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>没有麻烦和安全地调用您的close()方法.</p>
+<h4 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h4><p>可以使用@Cleanup以确保在代码执行路径退出当前作用域之前自动清除给定资源。您可以通过使用@Cleanup注释任何局部变量声明来执行此操作：<br>@Cleanup InputStream in = new FileInputStream(“some/file”);<br>结果，在您作用域范围的末尾调用in.close()。保证通过try / finally构造运行此调用。请看下面的示例，看看它是如何工作的。<br>如果要清理的对象类型没有close()方法，但是有其他一些无参数方法，则可以指定此方法的名称，如下所示：<br>@Cleanup(“dispose”) org.eclipse.swt.widgets.CoolBar bar = new CoolBar(parent, 0);<br>默认情况下，清除方法被假定为close()。@Cleanup无法调用带有1个或多个参数的清理方法。</p>
+<h4 id="With-Lombok"><a href="#With-Lombok" class="headerlink" title="With Lombok"></a>With Lombok</h4><pre><code>import lombok.Cleanup;
+import java.io.*;
+
+public class CleanupExample {
+  public static void main(String[] args) throws IOException {
+    @Cleanup InputStream in = new FileInputStream(args[0]);
+    @Cleanup OutputStream out = new FileOutputStream(args[1]);
+    byte[] b = new byte[10000];
+    while (true) {
+      int r = in.read(b);
+      if (r == -1) break;
+      out.write(b, 0, r);
+    }
+  }
+}
+</code></pre><h4 id="Vanilla-Java"><a href="#Vanilla-Java" class="headerlink" title="Vanilla Java"></a>Vanilla Java</h4><pre><code>import java.io.*;
+
+public class CleanupExample {
+  public static void main(String[] args) throws IOException {
+    InputStream in = new FileInputStream(args[0]);
+    try {
+      OutputStream out = new FileOutputStream(args[1]);
+      try {
+        byte[] b = new byte[10000];
+        while (true) {
+          int r = in.read(b);
+          if (r == -1) break;
+          out.write(b, 0, r);
+        }
+      } finally {
+        if (out != null) {
+          out.close();
+        }
+      }
+    } finally {
+      if (in != null) {
+        in.close();
+      }
+    }
+  }
+}
+</code></pre><h4 id="Supported-configuration-keys"><a href="#Supported-configuration-keys" class="headerlink" title="Supported configuration keys:"></a>Supported configuration keys:</h4><p>lombok.cleanup.flagUsage = [warning | error] (default: not set)<br>如果配置， Lombok会将任何@Cleanup用法标记为警告或错误。</p>
+<h4 id="Small-print"><a href="#Small-print" class="headerlink" title="Small print"></a>Small print</h4><p>在finally块中，只有在给定资源不是null的情况下才会调用cleanup方法。但是，如果您使用delombok在代码上，则插入lombok.Lombok.preventNullAnalysis(Object o)调用以防止警告，如果静态代码分析可以确定，则不需要进行 null-check。使用 lombok.jar 类路径进行编译会删除该方法调用，因此不存在运行时依赖性。<br>如果您的代码抛出异常，并且随后触发的清理方法调用也会抛出异常，则清理调用抛出的异常将隐藏原始异常。你不应该依赖这个“功能”。最好是，lombok想生成代码，这样，如果主体抛出了异常，那么关闭调用抛出的任何异常都会被静默吞噬（但如果主体以任何其他方式退出，则关闭调用的异常将不会是吞咽）。lombok的作者目前不知道实现这个方案的可行方法，但是如果java更新允许它，或者我们找到了一种方法，我们将修复它。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/07/05/Cleanup/" data-id="cjxpz6o860000lwv81w2t4llc" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Spring Boot实现confirm机制及ack消费端主动回调" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/my-blog/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/" class="article-date">
@@ -242,7 +323,7 @@ public class SenderService implements RabbitTemplate.ConfirmCallback,
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/" data-id="cjxpz3vjj0002bwv82ozso9t0" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/" data-id="cjxpz4g0f0000pgv8789shx1l" class="article-share-link">Share</a>
       
       
     </footer>
@@ -408,7 +489,7 @@ public class ItertorEnumeration implements Enumeration{
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/21/适配器模式/" data-id="cjxpz3vjm0005bwv8owxm4nwp" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/21/适配器模式/" data-id="cjxpz4g0u0005pgv875a64xud" class="article-share-link">Share</a>
       
       
     </footer>
@@ -873,7 +954,7 @@ String string3 = MapUtils.getString(map3, &quot;eee&quot;,&quot;没有值&quot;)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/" data-id="cjxpz3vk3000abwv851frsgm3" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/" data-id="cjxpz4g1e000apgv829g7endf" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1198,7 +1279,7 @@ private String remarks;//备注信息.
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/06/Jackson相关/" data-id="cjxpz3vjv0007bwv8jccgw9td" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/06/Jackson相关/" data-id="cjxpz4g110006pgv81uldut3u" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1423,7 +1504,7 @@ proxy 代理类的实例
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/31/代理模式/" data-id="cjxpz3vjw0008bwv84q6hfbj4" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/31/代理模式/" data-id="cjxpz4g130008pgv8mmfs0idl" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1660,7 +1741,7 @@ Person(name=yitian, nickname=null, age=25, identityCode=10000, birthday=1994-01-
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/" data-id="cjxpz3vju0006bwv8xm8rwmt4" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/" data-id="cjxpz4g120007pgv8o2cypm6c" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1730,7 +1811,7 @@ git rebase --continue
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/10/git回滚远程仓库/" data-id="cjxpz3vjg0001bwv8mfnkmrib" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/10/git回滚远程仓库/" data-id="cjxpz4g0l0001pgv85lg3ozp8" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1961,7 +2042,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/" data-id="cjxpz3vjx0009bwv86t89lcgm" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/" data-id="cjxpz4g140009pgv8x0czfhoi" class="article-share-link">Share</a>
       
       
     </footer>
@@ -2027,52 +2108,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjxpz3vjl0004bwv8qdcsjw8v" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/my-blog/2019/04/19/hello-world/" class="article-date">
-  <time datetime="2019-04-19T10:46:31.439Z" itemprop="datePublished">2019-04-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/my-blog/2019/04/19/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/hello-world/" data-id="cjxpz3vj60000bwv8fnd9u11e" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjxpz4g0s0003pgv8wkf9bre1" class="article-share-link">Share</a>
       
       
     </footer>
@@ -2105,7 +2141,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/04/">April 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/04/">April 2019</a></li></ul>
     </div>
   </div>
 
@@ -2116,6 +2152,10 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/my-blog/2019/07/05/Cleanup/">cleanup 自动资源管理</a>
+          </li>
         
           <li>
             <a href="/my-blog/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/">RabbitMQ数据丢失问题，Spring Boot实现confirm机制及ack消费端主动回调</a>
@@ -2131,10 +2171,6 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
         
           <li>
             <a href="/my-blog/2019/06/06/Jackson相关/">jackson 相关认识</a>
-          </li>
-        
-          <li>
-            <a href="/my-blog/2019/05/31/代理模式/">代理模式</a>
           </li>
         
       </ul>

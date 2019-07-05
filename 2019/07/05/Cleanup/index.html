@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>cleanup 自动资源管理 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="没有麻烦和安全地调用您的close()方法. Overview可以使用@Cleanup以确保在代码执行路径退出当前作用域之前自动清除给定资源。您可以通过使用@Cleanup注释任何局部变量声明来执行此操作：@Cleanup InputStream in = new FileInputStream(“some/file”);结果，在您作用域范围的末尾调用in.close()。保证通过try / fi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cleanup 自动资源管理">
+<meta property="og:url" content="https://github.com/zhaoqixing/my-blog.git/2019/07/05/Cleanup/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="没有麻烦和安全地调用您的close()方法. Overview可以使用@Cleanup以确保在代码执行路径退出当前作用域之前自动清除给定资源。您可以通过使用@Cleanup注释任何局部变量声明来执行此操作：@Cleanup InputStream in = new FileInputStream(“some/file”);结果，在您作用域范围的末尾调用in.close()。保证通过try / fi">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-05T10:47:14.742Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="cleanup 自动资源管理">
+<meta name="twitter:description" content="没有麻烦和安全地调用您的close()方法. Overview可以使用@Cleanup以确保在代码执行路径退出当前作用域之前自动清除给定资源。您可以通过使用@Cleanup注释任何局部变量声明来执行此操作：@Cleanup InputStream in = new FileInputStream(“some/file”);结果，在您作用域范围的末尾调用in.close()。保证通过try / fi">
+  
+    <link rel="alternate" href="/my-blog/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/my-blog/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/my-blog/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/my-blog/">Home</a>
+        
+          <a class="main-nav-link" href="/my-blog/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/my-blog/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://github.com/zhaoqixing/my-blog.git"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Cleanup" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/my-blog/2019/07/05/Cleanup/" class="article-date">
+  <time datetime="2019-07-05T10:47:14.741Z" itemprop="datePublished">2019-07-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      cleanup 自动资源管理
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>没有麻烦和安全地调用您的close()方法.</p>
+<h4 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h4><p>可以使用@Cleanup以确保在代码执行路径退出当前作用域之前自动清除给定资源。您可以通过使用@Cleanup注释任何局部变量声明来执行此操作：<br>@Cleanup InputStream in = new FileInputStream(“some/file”);<br>结果，在您作用域范围的末尾调用in.close()。保证通过try / finally构造运行此调用。请看下面的示例，看看它是如何工作的。<br>如果要清理的对象类型没有close()方法，但是有其他一些无参数方法，则可以指定此方法的名称，如下所示：<br>@Cleanup(“dispose”) org.eclipse.swt.widgets.CoolBar bar = new CoolBar(parent, 0);<br>默认情况下，清除方法被假定为close()。@Cleanup无法调用带有1个或多个参数的清理方法。</p>
+<h4 id="With-Lombok"><a href="#With-Lombok" class="headerlink" title="With Lombok"></a>With Lombok</h4><pre><code>import lombok.Cleanup;
+import java.io.*;
+
+public class CleanupExample {
+  public static void main(String[] args) throws IOException {
+    @Cleanup InputStream in = new FileInputStream(args[0]);
+    @Cleanup OutputStream out = new FileOutputStream(args[1]);
+    byte[] b = new byte[10000];
+    while (true) {
+      int r = in.read(b);
+      if (r == -1) break;
+      out.write(b, 0, r);
+    }
+  }
+}
+</code></pre><h4 id="Vanilla-Java"><a href="#Vanilla-Java" class="headerlink" title="Vanilla Java"></a>Vanilla Java</h4><pre><code>import java.io.*;
+
+public class CleanupExample {
+  public static void main(String[] args) throws IOException {
+    InputStream in = new FileInputStream(args[0]);
+    try {
+      OutputStream out = new FileOutputStream(args[1]);
+      try {
+        byte[] b = new byte[10000];
+        while (true) {
+          int r = in.read(b);
+          if (r == -1) break;
+          out.write(b, 0, r);
+        }
+      } finally {
+        if (out != null) {
+          out.close();
+        }
+      }
+    } finally {
+      if (in != null) {
+        in.close();
+      }
+    }
+  }
+}
+</code></pre><h4 id="Supported-configuration-keys"><a href="#Supported-configuration-keys" class="headerlink" title="Supported configuration keys:"></a>Supported configuration keys:</h4><p>lombok.cleanup.flagUsage = [warning | error] (default: not set)<br>如果配置， Lombok会将任何@Cleanup用法标记为警告或错误。</p>
+<h4 id="Small-print"><a href="#Small-print" class="headerlink" title="Small print"></a>Small print</h4><p>在finally块中，只有在给定资源不是null的情况下才会调用cleanup方法。但是，如果您使用delombok在代码上，则插入lombok.Lombok.preventNullAnalysis(Object o)调用以防止警告，如果静态代码分析可以确定，则不需要进行 null-check。使用 lombok.jar 类路径进行编译会删除该方法调用，因此不存在运行时依赖性。<br>如果您的代码抛出异常，并且随后触发的清理方法调用也会抛出异常，则清理调用抛出的异常将隐藏原始异常。你不应该依赖这个“功能”。最好是，lombok想生成代码，这样，如果主体抛出了异常，那么关闭调用抛出的任何异常都会被静默吞噬（但如果主体以任何其他方式退出，则关闭调用的异常将不会是吞咽）。lombok的作者目前不知道实现这个方案的可行方法，但是如果java更新允许它，或者我们找到了一种方法，我们将修复它。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/07/05/Cleanup/" data-id="cjxpz6o860000lwv81w2t4llc" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/my-blog/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">RabbitMQ数据丢失问题，Spring Boot实现confirm机制及ack消费端主动回调</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/07/">July 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/06/">June 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/05/">May 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/my-blog/archives/2019/04/">April 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/my-blog/2019/07/05/Cleanup/">cleanup 自动资源管理</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/">RabbitMQ数据丢失问题，Spring Boot实现confirm机制及ack消费端主动回调</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/06/21/适配器模式/">适配器模式</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/">commons-lang3-3.2.jar中的常用工具类的使用</a>
+          </li>
+        
+          <li>
+            <a href="/my-blog/2019/06/06/Jackson相关/">jackson 相关认识</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2019 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/my-blog/" class="mobile-nav-link">Home</a>
+  
+    <a href="/my-blog/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/my-blog/fancybox/jquery.fancybox.css">
+  <script src="/my-blog/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/my-blog/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
