@@ -62,6 +62,140 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-Feign配置问题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/my-blog/2019/07/19/Feign配置问题/" class="article-date">
+  <time datetime="2019-07-19T09:41:09.193Z" itemprop="datePublished">2019-07-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/my-blog/2019/07/19/Feign配置问题/">Feign配置问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Ribbon配置"><a href="#Ribbon配置" class="headerlink" title="Ribbon配置"></a>Ribbon配置</h3><pre><code># 设置连接超时时间
+ribbon.ConnectTimeout=600
+# 设置读取超时时间
+ribbon.ReadTimeout=6000
+# 对所有操作请求都进行重试
+ribbon.OkToRetryOnAllOperations=true
+# 切换实例的重试次数
+ribbon.MaxAutoRetriesNextServer=2
+# 对当前实例的重试次数
+ribbon.MaxAutoRetries=1
+</code></pre><p>如果我想针对不同的服务配置不同的连接超时和读取超时，那么我们可以在属性的前面加上服务的名字，如下：</p>
+<pre><code># 设置针对hello-service服务的连接超时时间
+hello-service.ribbon.ConnectTimeout=600
+# 设置针对hello-service服务的读取超时时间
+hello-service.ribbon.ReadTimeout=6000
+# 设置针对hello-service服务所有操作请求都进行重试
+hello-service.ribbon.OkToRetryOnAllOperations=true
+# 设置针对hello-service服务切换实例的重试次数
+hello-service.ribbon.MaxAutoRetriesNextServer=2
+# 设置针对hello-service服务的当前实例的重试次数
+hello-service.ribbon.MaxAutoRetries=1
+</code></pre><h3 id="Hystrix配置"><a href="#Hystrix配置" class="headerlink" title="Hystrix配置"></a>Hystrix配置</h3><pre><code># 设置熔断超时时间
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds=10000
+# 关闭Hystrix功能（不要和上面的配置一起使用）
+feign.hystrix.enabled=false
+# 关闭熔断功能
+hystrix.command.default.execution.timeout.enabled=false
+</code></pre><p>这种配置也是全局配置，如果我们想针对某一个接口配置，比如/hello接口，那么可以按照下面这种写法，如下：</p>
+<pre><code># 设置熔断超时时间
+hystrix.command.hello.execution.isolation.thread.timeoutInMilliseconds=10000
+# 关闭熔断功能
+hystrix.command.hello.execution.timeout.enabled=false
+</code></pre><h3 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h3><p>Spring Cloud Feign支持对请求和响应进行GZIP压缩，以提高通信效率，配置方式如下：</p>
+<pre><code># 配置请求GZIP压缩
+feign.compression.request.enabled=true
+# 配置响应GZIP压缩
+feign.compression.response.enabled=true
+# 配置压缩支持的MIME TYPE
+feign.compression.request.mime-types=text/xml,application/xml,application/json
+# 配置压缩数据大小的下限
+feign.compression.request.min-request-size=2048
+</code></pre><h3 id="hystrix参数如下"><a href="#hystrix参数如下" class="headerlink" title="hystrix参数如下"></a>hystrix参数如下</h3><pre><code>hystrix.command.default和hystrix.threadpool.default中的default为默认CommandKey
+
+Command Properties
+Execution相关的属性的配置：
+hystrix.command.default.execution.isolation.strategy 隔离策略，默认是Thread, 可选Thread｜Semaphore
+
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds 命令执行超时时间，默认1000ms
+
+hystrix.command.default.execution.timeout.enabled 执行是否启用超时，默认启用true
+hystrix.command.default.execution.isolation.thread.interruptOnTimeout 发生超时是是否中断，默认true
+hystrix.command.default.execution.isolation.semaphore.maxConcurrentRequests 最大并发请求数，默认10，该参数当使用ExecutionIsolationStrategy.SEMAPHORE策略时才有效。如果达到最大并发请求数，请求会被拒绝。理论上选择semaphore size的原则和选择thread size一致，但选用semaphore时每次执行的单元要比较小且执行速度快（ms级别），否则的话应该用thread。
+semaphore应该占整个容器（tomcat）的线程池的一小部分。
+Fallback相关的属性
+这些参数可以应用于Hystrix的THREAD和SEMAPHORE策略
+
+hystrix.command.default.fallback.isolation.semaphore.maxConcurrentRequests 如果并发数达到该设置值，请求会被拒绝和抛出异常并且fallback不会被调用。默认10
+hystrix.command.default.fallback.enabled 当执行失败或者请求被拒绝，是否会尝试调用hystrixCommand.getFallback() 。默认true
+Circuit Breaker相关的属性
+hystrix.command.default.circuitBreaker.enabled 用来跟踪circuit的健康性，如果未达标则让request短路。默认true
+hystrix.command.default.circuitBreaker.requestVolumeThreshold 一个rolling window内最小的请求数。如果设为20，那么当一个rolling window的时间内（比如说1个rolling window是10秒）收到19个请求，即使19个请求都失败，也不会触发circuit break。默认20
+hystrix.command.default.circuitBreaker.sleepWindowInMilliseconds 触发短路的时间值，当该值设为5000时，则当触发circuit break后的5000毫秒内都会拒绝request，也就是5000毫秒后才会关闭circuit。默认5000
+hystrix.command.default.circuitBreaker.errorThresholdPercentage错误比率阀值，如果错误率&gt;=该值，circuit会被打开，并短路所有请求触发fallback。默认50
+hystrix.command.default.circuitBreaker.forceOpen 强制打开熔断器，如果打开这个开关，那么拒绝所有request，默认false
+hystrix.command.default.circuitBreaker.forceClosed 强制关闭熔断器 如果这个开关打开，circuit将一直关闭且忽略circuitBreaker.errorThresholdPercentage
+Metrics相关参数
+hystrix.command.default.metrics.rollingStats.timeInMilliseconds 设置统计的时间窗口值的，毫秒值，circuit break 的打开会根据1个rolling window的统计来计算。若rolling window被设为10000毫秒，则rolling window会被分成n个buckets，每个bucket包含success，failure，timeout，rejection的次数的统计信息。默认10000
+hystrix.command.default.metrics.rollingStats.numBuckets 设置一个rolling window被划分的数量，若numBuckets＝10，rolling window＝10000，那么一个bucket的时间即1秒。必须符合rolling window % numberBuckets == 0。默认10
+hystrix.command.default.metrics.rollingPercentile.enabled 执行时是否enable指标的计算和跟踪，默认true
+hystrix.command.default.metrics.rollingPercentile.timeInMilliseconds 设置rolling percentile window的时间，默认60000
+hystrix.command.default.metrics.rollingPercentile.numBuckets 设置rolling percentile window的numberBuckets。逻辑同上。默认6
+hystrix.command.default.metrics.rollingPercentile.bucketSize 如果bucket size＝100，window＝10s，若这10s里有500次执行，只有最后100次执行会被统计到bucket里去。增加该值会增加内存开销以及排序的开销。默认100
+hystrix.command.default.metrics.healthSnapshot.intervalInMilliseconds 记录health 快照（用来统计成功和错误绿）的间隔，默认500ms
+Request Context 相关参数
+hystrix.command.default.requestCache.enabled 默认true，需要重载getCacheKey()，返回null时不缓存
+hystrix.command.default.requestLog.enabled 记录日志到HystrixRequestLog，默认true
+
+Collapser Properties 相关参数
+hystrix.collapser.default.maxRequestsInBatch 单次批处理的最大请求数，达到该数量触发批处理，默认Integer.MAX_VALUE
+hystrix.collapser.default.timerDelayInMilliseconds 触发批处理的延迟，也可以为创建批处理的时间＋该值，默认10
+hystrix.collapser.default.requestCache.enabled 是否对HystrixCollapser.execute() and HystrixCollapser.queue()的cache，默认true
+
+ThreadPool 相关参数
+线程数默认值10适用于大部分情况（有时可以设置得更小），如果需要设置得更大，那有个基本得公式可以follow：
+requests per second at peak when healthy × 99th percentile latency in seconds + some breathing room
+每秒最大支撑的请求数 (99%平均响应时间 + 缓存值)
+比如：每秒能处理1000个请求，99%的请求响应时间是60ms，那么公式是：
+（0.060+0.012）
+
+基本得原则时保持线程池尽可能小，他主要是为了释放压力，防止资源被阻塞。
+当一切都是正常的时候，线程池一般仅会有1到2个线程激活来提供服务
+
+hystrix.threadpool.default.coreSize 并发执行的最大线程数，默认10
+hystrix.threadpool.default.maxQueueSize BlockingQueue的最大队列数，当设为－1，会使用SynchronousQueue，值为正时使用LinkedBlcokingQueue。该设置只会在初始化时有效，之后不能修改threadpool的queue size，除非reinitialising thread executor。默认－1。
+hystrix.threadpool.default.queueSizeRejectionThreshold 即使maxQueueSize没有达到，达到queueSizeRejectionThreshold该值后，请求也会被拒绝。因为maxQueueSize不能被动态修改，这个参数将允许我们动态设置该值。if maxQueueSize == -1，该字段将不起作用
+hystrix.threadpool.default.keepAliveTimeMinutes 如果corePoolSize和maxPoolSize设成一样（默认实现）该设置无效。如果通过plugin（https://github.com/Netflix/Hystrix/wiki/Plugins）使用自定义实现，该设置才有用，默认1.
+hystrix.threadpool.default.metrics.rollingStats.timeInMilliseconds 线程池统计指标的时间，默认10000
+hystrix.threadpool.default.metrics.rollingStats.numBuckets 将rolling window划分为n个buckets，默认10
+</code></pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/07/19/Feign配置问题/" data-id="cjy9xbpxd0007r4v866zxb8tv" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-Cleanup" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/my-blog/2019/07/05/Cleanup/" class="article-date">
@@ -133,7 +267,7 @@ public class CleanupExample {
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/07/05/Cleanup/" data-id="cjxpz6o860000lwv81w2t4llc" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/07/05/Cleanup/" data-id="cjy9xbpwn0000r4v8rn46gmde" class="article-share-link">Share</a>
       
       
     </footer>
@@ -323,7 +457,7 @@ public class SenderService implements RabbitTemplate.ConfirmCallback,
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/" data-id="cjxpz4g0f0000pgv8789shx1l" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/28/Spring Boot实现confirm机制及ack消费端主动回调/" data-id="cjy9xbpwy0002r4v8c98v5dha" class="article-share-link">Share</a>
       
       
     </footer>
@@ -489,7 +623,7 @@ public class ItertorEnumeration implements Enumeration{
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/21/适配器模式/" data-id="cjxpz4g0u0005pgv875a64xud" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/21/适配器模式/" data-id="cjy9xbpx50006r4v8pif9np69" class="article-share-link">Share</a>
       
       
     </footer>
@@ -954,7 +1088,7 @@ String string3 = MapUtils.getString(map3, &quot;eee&quot;,&quot;没有值&quot;)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/" data-id="cjxpz4g1e000apgv829g7endf" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/" data-id="cjy9xbpxs000cr4v86yub16gw" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1279,7 +1413,7 @@ private String remarks;//备注信息.
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/06/Jackson相关/" data-id="cjxpz4g110006pgv81uldut3u" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/06/06/Jackson相关/" data-id="cjy9xbpxg0009r4v8fpu40smw" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1504,7 +1638,7 @@ proxy 代理类的实例
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/31/代理模式/" data-id="cjxpz4g130008pgv8mmfs0idl" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/31/代理模式/" data-id="cjy9xbpxl000br4v8ddc2aavc" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1741,7 +1875,7 @@ Person(name=yitian, nickname=null, age=25, identityCode=10000, birthday=1994-01-
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/" data-id="cjxpz4g120007pgv8o2cypm6c" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/24/Jackson快速入门/" data-id="cjy9xbpxf0008r4v86v39cx3m" class="article-share-link">Share</a>
       
       
     </footer>
@@ -1811,7 +1945,7 @@ git rebase --continue
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/10/git回滚远程仓库/" data-id="cjxpz4g0l0001pgv85lg3ozp8" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/05/10/git回滚远程仓库/" data-id="cjy9xbpww0001r4v80203zeid" class="article-share-link">Share</a>
       
       
     </footer>
@@ -2042,73 +2176,7 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/" data-id="cjxpz4g140009pgv8x0czfhoi" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-java 10 新特性" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/my-blog/2019/04/19/java 10 新特性/" class="article-date">
-  <time datetime="2019-04-19T12:27:17.449Z" itemprop="datePublished">2019-04-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/my-blog/2019/04/19/java 10 新特性/">JAVA 10</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>java 9才发布几个月，很多玩意都没整明白，现在Java 10又要来了。</p>
-<p>这时候我真想说：线上用的JDK 7，甚至JDK 6，而JDK 8 还没用熟，JDK 9 才发布不久不知道啥玩意，JDK 10……</p>
-<p>刚学Java的同学是不是感觉一脸蒙逼？</p>
-<p>就连我这个老司机也同样感觉如此！</p>
-<p>Java 更新越来越快，我们做技术的也要跟上步伐，不然总会慢别人一拍，这新东西从国外到国内应用一般要好几年的时间，如果我们提前了解并应用这些新技术对自己不是坏事。</p>
-<p>Java 10的新特性</p>
-<p>说了这么多，看Java 10都会有哪些特性来改变我们写代码的方式呢？！</p>
-<h3 id="1-局部变量类型推断"><a href="#1-局部变量类型推断" class="headerlink" title="1. 局部变量类型推断"></a>1. 局部变量类型推断</h3><p>局部变量类型推断可以说是Java 10中最值得注意的特性，这是Java语言开发人员为了简化Java应用程序的编写而采取的又一步，如下图所示。</p>
-<p>这个新功能将为Java增加一些语法糖 - 简化它并改善开发者体验。新的语法将减少与编写Java相关的冗长度，同时保持对静态类型安全性的承诺。</p>
-<p>局部变量类型推断将引入”var”关键字，也就是你可以随意定义变量而不必指定变量的类型，如：</p>
-<p>将被下面这个新语法所取代：</p>
-<p>看完是不是有点JS的即视感？？？越来越像JS了吗？！虽然类型推断在Java中不是一个新概念，但在局部变量中确是很大的一个改进。</p>
-<p>说到类型推断，从JDK 5引进泛型，到JDK 7的”&lt;&gt;”操作符允许不绑定类型而初始化List，再到JDK 8的Lambda表达式，再到现在JDK 10的局部变量类型推断，Java类型推断正大刀阔斧的向前发展。</p>
-<p>局部变量类型推荐仅限于如下使用场景：</p>
-<p>局部变量初始化for循环内部索引变量传统的for循环声明变量Java官方表示，它不能用于以下几个地方：</p>
-<p>方法参数构造函数参数方法返回类型字段捕获表达式（或任何其他类型的变量声明）</p>
-<h3 id="2-GC改进和内存管理"><a href="#2-GC改进和内存管理" class="headerlink" title="2. GC改进和内存管理"></a>2. GC改进和内存管理</h3><p>JDK 10中有2个JEP专门用于改进当前的垃圾收集元素。</p>
-<p>第一个垃圾收集器接口是（JEP 304），它将引入一个纯净的垃圾收集器接口，以帮助改进不同垃圾收集器的源代码隔离。</p>
-<p>预定用于Java 10的第二个JEP是针对G1的并行完全GC（JEP 307），其重点在于通过完全GC并行来改善G1最坏情况的等待时间。G1是Java 9中的默认GC，并且此JEP的目标是使G1平行。</p>
-<h3 id="3-线程本地握手（JEP-312）"><a href="#3-线程本地握手（JEP-312）" class="headerlink" title="3. 线程本地握手（JEP 312）"></a>3. 线程本地握手（JEP 312）</h3><p>JDK 10将引入一种在线程上执行回调的新方法，因此这将会很方便能停止单个线程而不是停止全部线程或者一个都不停。</p>
-<h3 id="4-备用内存设备上的堆分配（JEP-316）"><a href="#4-备用内存设备上的堆分配（JEP-316）" class="headerlink" title="4. 备用内存设备上的堆分配（JEP 316）"></a>4. 备用内存设备上的堆分配（JEP 316）</h3><p>允许HotSpot VM在备用内存设备上分配Java对象堆内存，该内存设备将由用户指定。</p>
-<h3 id="5-其他Unicode语言-标记扩展（JEP-314）"><a href="#5-其他Unicode语言-标记扩展（JEP-314）" class="headerlink" title="5. 其他Unicode语言 - 标记扩展（JEP 314）"></a>5. 其他Unicode语言 - 标记扩展（JEP 314）</h3><p>目标是增强java.util.Locale及其相关的API，以便实现语言标记语法的其他Unicode扩展（BCP 47）。</p>
-<h3 id="6-基于Java的实验性JIT编译器"><a href="#6-基于Java的实验性JIT编译器" class="headerlink" title="6. 基于Java的实验性JIT编译器"></a>6. 基于Java的实验性JIT编译器</h3><p>Oracle希望将其Java JIT编译器Graal用作Linux / x64平台上的实验性JIT编译器。</p>
-<h3 id="7-根证书（JEP-319）"><a href="#7-根证书（JEP-319）" class="headerlink" title="7. 根证书（JEP 319）"></a>7. 根证书（JEP 319）</h3><p>这个的目标是在Oracle的Java SE中开源根证书。</p>
-<h3 id="8-根证书颁发认证"><a href="#8-根证书颁发认证" class="headerlink" title="8. 根证书颁发认证"></a>8. 根证书颁发认证</h3><p>这将使OpenJDK对开发人员更具吸引力，它还旨在减少OpenJDK和Oracle JDK构建之间的差异。</p>
-<h3 id="9-将JDK生态整合单个存储库（JEP-296）"><a href="#9-将JDK生态整合单个存储库（JEP-296）" class="headerlink" title="9. 将JDK生态整合单个存储库（JEP 296）"></a>9. 将JDK生态整合单个存储库（JEP 296）</h3><p>此JEP的主要目标是执行一些内存管理，并将JDK生态的众多存储库组合到一个存储库中。</p>
-<h3 id="10-删除工具javah（JEP-313）"><a href="#10-删除工具javah（JEP-313）" class="headerlink" title="10. 删除工具javah（JEP 313）"></a>10. 删除工具javah（JEP 313）</h3><p>从JDK中移除了javah工具，这个很简单并且很重要。</p>
-<p>Java 10尝鲜</p>
-<p>就像所有其他JDK版本一样，Oracle已经发布了一个Java 10初始候选版本，Java开发者可以下载此版本用来测试新功能。如果你对Java 10抱有期待想提早尝试，那么现在就开始吧！</p>
-<p>尝鲜地址：<a href="http://openjdk.java.net/projects/jdk/10/" target="_blank" rel="noopener">http://openjdk.java.net/projects/jdk/10/</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/19/java 10 新特性/" data-id="cjxpz4g0s0003pgv8wkf9bre1" class="article-share-link">Share</a>
+      <a data-url="https://github.com/zhaoqixing/my-blog.git/2019/04/30/《Java 8 in Action》Chapter 12：新的日期和时间API/" data-id="cjy9xbpxi000ar4v82ys0nuxz" class="article-share-link">Share</a>
       
       
     </footer>
@@ -2154,6 +2222,10 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
       <ul>
         
           <li>
+            <a href="/my-blog/2019/07/19/Feign配置问题/">Feign配置问题</a>
+          </li>
+        
+          <li>
             <a href="/my-blog/2019/07/05/Cleanup/">cleanup 自动资源管理</a>
           </li>
         
@@ -2167,10 +2239,6 @@ LocalDateTime timeFromInstant = LocalDateTime.ofInstant(instant, shanghaiZone);
         
           <li>
             <a href="/my-blog/2019/06/14/commons-lang3-3.2.jar中的常用工具类的使用/">commons-lang3-3.2.jar中的常用工具类的使用</a>
-          </li>
-        
-          <li>
-            <a href="/my-blog/2019/06/06/Jackson相关/">jackson 相关认识</a>
           </li>
         
       </ul>
